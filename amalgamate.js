@@ -1,6 +1,7 @@
 
 var operations, render_internal, render, builders;
 
+/** Functionality behind instruction operations **/
 operations = {
     replace: function (ctx, data) {
         return ctx[data];
@@ -45,6 +46,110 @@ builders = {
     }
 };
 
+/** Generate compiled template from template string **/
+compile = function() {
+    var composeParts = function (parts, collected) {
+        var result = [];
+        for (var i = 0, len = parts.length; i < len; i++) {
+            var part = parts[i];
+            if (typeof part === 'string') {
+                result.push(part);
+            } else {
+                result.push(collected[part]);
+            }
+        }
+        return result.join('');
+    };
+    var until = function() {
+        var stopAtParts = Array.prototype.slice.call(arguments, 0);
+        return function(string, collected) {
+            var stopAt = composeParts(stopAtParts, collected),
+                sliceTo = string.indexOf(stopAt);
+            if (sliceTo === -1) {
+                return [string, ''];
+            }
+            return [string.slice(0, sliceTo), string.slice(sliceTo)];
+        }
+    };
+    var skip = function() {
+        var skipParts = Array.prototype.slice.call(arguments, 0);
+        return function(string, collected) {
+            var skip = composeParts(skipParts, collected);
+            if (string.indexOf(skip) === 0) {
+                return ['', string.slice(skip.length)];
+            }
+            return false;
+        }
+    };
+    var instructionTypes = [
+        // Ordinary text
+        {
+            rule: [until('{{')],
+            parse: function (parts) {
+                return parts[0];
+            }
+        },
+
+        // Array
+        {
+            rule: [
+                skip('{{#'),
+                until('}}'),
+                skip('}}'),
+                until('{{/', 1, '}}'),
+                skip('{{/', 1, '}}')
+            ],
+            parse: function (parts) {
+                return builders.array(parts[1], compile(parts[3]));
+            }
+        },
+
+        // Object (scope reset)
+        {
+            rule: [
+                skip('{{@'),
+                until('}}'),
+                skip('}}'),
+                until('{{/', 1, '}}'),
+                skip('{{/', 1, '}}')
+            ],
+            parse: function (parts) {
+                return builders.object(parts[1], compile(parts[3]));
+            }
+        },
+
+        // Replacements
+        {
+            rule: [skip('{{'), until('}}'), skip('}}')],
+            parse: function (parts) {
+                return builders.replace(parts[1]);
+            }
+        }
+    ];
+    return function(templateString) {
+        var instructions = [],
+            nInstructionTypes = instructionTypes.length;
+        while (templateString.length) {
+            instructionsTypesLoop:
+            for (var i = 0; i < nInstructionTypes; i++) {
+                var token = instructionTypes[i],
+                    data = [];
+                for (var j = 0, len = token.rule.length; j < len; j++) {
+                    var result = token.rule[j](templateString, data);
+                    if (result === false) {
+                        continue instructionsTypesLoop;
+                    }
+                    data.push(result[0]);
+                    templateString = result[1];
+                }
+                instructions.push(token.parse(data));
+            }
+        }
+        return instructions;
+    };
+}();
+
+/** Gory rendering details **/
 render_internal = function(compiled, context) {
     var len = compiled.length,
         rendered = Array(compiled.length);
@@ -73,9 +178,6 @@ render = function(compiled, context) {
 
 module.exports = {
     render: render,
-
-    '$rep': builders.replace,
-    '$arr': builders.array,
-    '$obj': builders.object
+    compile: compile,
 }
 

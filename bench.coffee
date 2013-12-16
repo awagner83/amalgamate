@@ -13,7 +13,7 @@ mkTests = ->
         context: {}
         expected: 'hello world'
         implementations: [
-            mkAmalgamate ['hello world']
+            mkAmalgamate 'hello world'
             mkDust 'hello world'
             mkHandlebars 'hello world'
             mkMustache 'hello world'
@@ -23,12 +23,7 @@ mkTests = ->
         context: {me: 'Adam', you: 'Bob'}
         expected: "hello Bob, I'm Adam"
         implementations: [
-            mkAmalgamate [
-                'hello '
-                amalgamate.$rep('you')
-                ", I'm "
-                amalgamate.$rep('me')
-            ]
+            mkAmalgamate "hello {{you}}, I'm {{me}}"
             mkDust "hello {you|s}, I'm {me|s}"
             mkHandlebars "hello {{{you}}}, I'm {{{me}}}"
             mkMustache "hello {{{you}}}, I'm {{{me}}}"
@@ -41,11 +36,7 @@ mkTests = ->
                 last: 'Smith'
         expected: "Smith, Bob"
         implementations: [
-            mkAmalgamate [
-                amalgamate.$rep('name.last')
-                ', '
-                amalgamate.$rep('name.first')
-            ]
+            mkAmalgamate "{{name.last}}, {{name.first}}"
             mkDust "{name.last|s}, {name.first|s}"
             mkHandlebars "{{{name.last}}}, {{{name.first}}}"
             mkMustache "{{{name.last}}}, {{{name.first}}}"
@@ -55,10 +46,7 @@ mkTests = ->
         context: {people: []}
         expected: "people:"
         implementations: [
-            mkAmalgamate [
-                "people:"
-                amalgamate.$arr('people', [amalgamate.$rep('name'), ', '])
-            ]
+            mkAmalgamate "people:{{#people}}{{name}}, {{/people}}"
             mkDust "people:{#people}{name|s}, {/people}"
             mkHandlebars "people:{{#people}}{{{name}}}, {{/people}}"
             mkMustache "people:{{#people}}{{{name}}}, {{/people}}"
@@ -68,10 +56,7 @@ mkTests = ->
         context: {people: [{name: 'bob'}, {name: 'fred'}, {name: 'jim'}]}
         expected: "bob, fred, jim, and others"
         implementations: [
-            mkAmalgamate [
-                amalgamate.$arr('people', [amalgamate.$rep('name'), ', '])
-                "and others"
-            ]
+            mkAmalgamate "{{#people}}{{name}}, {{/people}}and others"
             mkDust "{#people}{name|s}, {/people}and others"
             mkHandlebars "{{#people}}{{{name}}}, {{/people}}and others"
             mkMustache "{{#people}}{{{name}}}, {{/people}}and others"
@@ -95,17 +80,7 @@ mkTests = ->
             ]
         expected: "2 (4, 6, 8, ...); 3 (6, 9, 12, ...); 5 (10, 15, 20, ...); "
         implementations: [
-            mkAmalgamate [
-                amalgamate.$arr('primes', [
-                    amalgamate.$rep('prime')
-                    " ("
-                    amalgamate.$arr('composites', [
-                        amalgamate.$rep('composite')
-                        ', '
-                    ])
-                    "...); "
-                ])
-            ]
+            mkAmalgamate "{{#primes}}{{prime}} ({{#composites}}{{composite}}, {{/composites}}...); {{/primes}}"
             mkDust "{#primes}{prime|s} ({#composites}{composite|s}, {/composites}...); {/primes}"
             mkHandlebars "{{#primes}}{{{prime}}} ({{#composites}}{{{composite}}}, {{/composites}}...); {{/primes}}"
             mkMustache "{{#primes}}{{{prime}}} ({{#composites}}{{{composite}}}, {{/composites}}...); {{/primes}}"
@@ -118,13 +93,7 @@ mkTests = ->
                 last: 'Smith'
         expected: "Smith, Bob"
         implementations: [
-            mkAmalgamate [
-                amalgamate.$obj('name', [
-                    amalgamate.$rep('last')
-                    ', '
-                    amalgamate.$rep('first')
-                ])
-            ]
+            mkAmalgamate "{{@name}}{{last}}, {{first}}{{/name}}"
             mkDust "{#name}{last|s}, {first|s}{/name}"
             mkHandlebars "{{#name}}{{{last}}}, {{{first}}}{{/name}}"
             mkMustache "{{#name}}{{{last}}}, {{{first}}}{{/name}}"
@@ -135,7 +104,7 @@ mkTests = ->
 
 mkAmalgamate = (template) ->
     name: 'amalgamate'
-    compile: -> template
+    compile: -> amalgamate.compile template
     run: (compiled, context) -> amalgamate.render compiled, context
 
 mkHandlebars = (template) ->
