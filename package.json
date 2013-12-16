@@ -9,6 +9,9 @@
     },
     "devDependencies": {
         "benchmark": "*",
-        "mustache": "*"
+        "mustache": "*",
+        "handlebars": "*",
+        "dustjs-linkedin": "*",
+        "underscore": "*"
     }
 }
