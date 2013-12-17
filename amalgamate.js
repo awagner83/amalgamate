@@ -25,6 +25,14 @@ operations = {
     },
     object: function (ctx, data) {
         return render(data.template, ctx[data.object]);
+    },
+    ifSo: function (ctx, data) {
+        if (ctx[data.name]) return render(data.template, ctx);
+        return '';
+    },
+    ifNot: function (ctx, data) {
+        if (!ctx[data.name]) return render(data.template, ctx);
+        return '';
     }
 
 };
@@ -43,6 +51,12 @@ builders = {
     },
     object: function(object, template) {
         return { op: operations.object, data: { object: object, template: template } };
+    },
+    ifSo: function(name, template) {
+        return { op: operations.ifSo, data: { name: name, template: template } };
+    },
+    ifNot: function(name, template) {
+        return { op: operations.ifNot, data: { name: name, template: template } };
     }
 };
 
@@ -81,42 +95,25 @@ compile = function() {
             return false;
         }
     };
+    var blockInstruction = function(prefix, builder) {
+        return {
+            rule: [
+                skip('{{' + prefix),
+                until('}}'),
+                skip('}}'),
+                until('{{/', 1, '}}'),
+                skip('{{/', 1, '}}')
+            ],
+            parse: function (parts) {
+                return builder(parts[1], compile(parts[3]));
+            }
+        };
+    };
     var instructionTypes = [
-        // Ordinary text
-        {
-            rule: [until('{{')],
-            parse: function (parts) {
-                return parts[0];
-            }
-        },
-
-        // Array
-        {
-            rule: [
-                skip('{{#'),
-                until('}}'),
-                skip('}}'),
-                until('{{/', 1, '}}'),
-                skip('{{/', 1, '}}')
-            ],
-            parse: function (parts) {
-                return builders.array(parts[1], compile(parts[3]));
-            }
-        },
-
-        // Object (scope reset)
-        {
-            rule: [
-                skip('{{@'),
-                until('}}'),
-                skip('}}'),
-                until('{{/', 1, '}}'),
-                skip('{{/', 1, '}}')
-            ],
-            parse: function (parts) {
-                return builders.object(parts[1], compile(parts[3]));
-            }
-        },
+        blockInstruction('#', builders.array),
+        blockInstruction('@', builders.object),
+        blockInstruction('?', builders.ifSo),
+        blockInstruction('^', builders.ifNot),
 
         // Replacements
         {
@@ -124,7 +121,15 @@ compile = function() {
             parse: function (parts) {
                 return builders.replace(parts[1]);
             }
-        }
+        },
+
+        // Ordinary text
+        {
+            rule: [until('{{')],
+            parse: function (parts) {
+                return parts[0];
+            }
+        },
     ];
     return function(templateString) {
         var instructions = [],
@@ -133,16 +138,19 @@ compile = function() {
             instructionsTypesLoop:
             for (var i = 0; i < nInstructionTypes; i++) {
                 var token = instructionTypes[i],
+                    tempTemplateString = templateString,
                     data = [];
                 for (var j = 0, len = token.rule.length; j < len; j++) {
-                    var result = token.rule[j](templateString, data);
+                    var result = token.rule[j](tempTemplateString, data);
                     if (result === false) {
                         continue instructionsTypesLoop;
                     }
                     data.push(result[0]);
-                    templateString = result[1];
+                    tempTemplateString = result[1];
                 }
                 instructions.push(token.parse(data));
+                templateString = tempTemplateString;
+                break;
             }
         }
         return instructions;

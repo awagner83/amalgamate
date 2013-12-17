@@ -42,6 +42,26 @@ mkTests = ->
             mkMustache "{{{name.last}}}, {{{name.first}}}"
             mkUnderscore "<%=name.last %>, <%=name.first %>"
         ]
+    ifSo:
+        context: {isTrue: true}
+        expected: "Yes, it's true"
+        implementations: [
+            mkAmalgamate "{{?isTrue}}Yes, it's true{{/isTrue}}{{?isFalse}}No, it's false{{/isFalse}}"
+            mkDust "{?isTrue}Yes, it's true{/isTrue}{?isFalse}No, it's false{/isFalse}"
+            mkHandlebars "{{#isTrue}}Yes, it's true{{/isTrue}}{{#isFalse}}No, it's false{{/isFalse}}"
+            mkMustache "{{#isTrue}}Yes, it's true{{/isTrue}}{{#isFalse}}No, it's false{{/isFalse}}"
+            mkUnderscore "<% if(isTrue) { %>Yes, it's true<% } %><% if(typeof isFalse !== 'undefined') { %>No, it's false<% } %>"
+        ]
+    ifNot:
+        context: {isTrue: false}
+        expected: "No, it's false.  Also false."
+        implementations: [
+            mkAmalgamate "{{^isTrue}}No, it's false.{{/isTrue}}  {{^foo}}Also false.{{/foo}}"
+            mkDust "{^isTrue}No, it's false.{/isTrue}  {^foo}Also false.{/foo}"
+            mkHandlebars "{{^isTrue}}No, it's false.{{/isTrue}}  {{^foo}}Also false.{{/foo}}"
+            mkMustache "{{^isTrue}}No, it's false.{{/isTrue}}  {{^foo}}Also false.{{/foo}}"
+            mkUnderscore "<% if(!isTrue) { %>No, it's false.<% } %><% if(typeof foo === 'undefined') { %>  Also false.<% } %>"
+        ]
     emptyArray:
         context: {people: []}
         expected: "people:"
