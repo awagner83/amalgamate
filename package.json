@@ -12,6 +12,7 @@
         "mustache": "*",
         "handlebars": "*",
         "dustjs-linkedin": "*",
-        "underscore": "*"
+        "underscore": "*",
+        "nodeunit": "*"
     }
 }

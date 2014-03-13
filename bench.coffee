@@ -119,12 +119,26 @@ mkTests = ->
             mkMustache "{{#name}}{{{last}}}, {{{first}}}{{/name}}"
             mkUnderscore "<% var first = name.first, last = name.last %><%=last %>, <%=first%>"
         ]
+    nestedObject:
+        context:
+            name:
+                name:
+                    first: 'bob'
+        expected: "bob"
+        implementations: [
+            mkAmalgamate "{{@name}}{{@name}}{{first}}{{/name}}{{/name}}"
+            mkDust "{#name}{#name}{first|s}{/name}{/name}"
+            mkHandlebars "{{#name}}{{#name}}{{first}}{{/name}}{{/name}}"
+            mkMustache "{{#name}}{{#name}}{{first}}{{/name}}{{/name}}"
+            mkUnderscore "<% var first = name.name.first, last = name.name.last %><%=first%>"
+        ]
 
 
 
 mkAmalgamate = (template) ->
     name: 'amalgamate'
-    compile: -> amalgamate.compile template
+    compile: ->
+        amalgamate.compile template
     run: (compiled, context) -> amalgamate.render compiled, context
 
 mkHandlebars = (template) ->
@@ -155,7 +169,11 @@ mkDust = (template) ->
 
 suite = new Benchmark.Suite
 
-_.each mkTests(), (test, name) ->
+allTests = mkTests()
+requestedTests = process.argv.slice 2
+tests = if requestedTests.length then _.pick allTests, requestedTests else allTests
+
+_.each tests, (test, name) ->
     return if test.disabled
     _.each test.implementations, (impl) ->
         compiled = impl.compile()

@@ -97,17 +97,33 @@
                 return false;
             }
         };
+        var not = function(cannotBe) {
+            return function(string, collected) {
+                if (cannotBe.indexOf(string.slice(0, 1)) === -1) {
+                    return [string.slice(0, 1), string.slice(1)];
+                }
+                return false;
+            }
+        };
+        var recurse = function(string, collected) {
+            var result = compile(string, true);
+            if (result.partial) {
+                return [result.instructions, result.leftovers];
+            } else {
+                return [result, ''];
+            }
+        };
         var blockInstruction = function(prefix, builder) {
             return {
                 rule: [
                     skip('{{' + prefix),
                     until('}}'),
                     skip('}}'),
-                    until('{{/', 1, '}}'),
+                    recurse,
                     skip('{{/', 1, '}}')
                 ],
                 parse: function (parts) {
-                    return builder(parts[1], compile(parts[3]));
+                    return builder(parts[1], parts[3]);
                 }
             };
         };
@@ -119,9 +135,9 @@
 
             // Replacements
             {
-                rule: [skip('{{'), until('}}'), skip('}}')],
+                rule: [skip('{{'), not('#@?^/'), until('}}'), skip('}}')],
                 parse: function (parts) {
-                    return builders.replace(parts[1]);
+                    return builders.replace(parts[1] + parts[2]);
                 }
             },
 
@@ -133,10 +149,14 @@
                 }
             },
         ];
-        return function(templateString) {
+        return function(templateString, keepLeftovers) {
             var instructions = [],
-                nInstructionTypes = instructionTypes.length;
-            while (templateString.length) {
+                nInstructionTypes = instructionTypes.length,
+                lengthBefore = null;
+            while (templateString.length
+                    // Ensure we never loop forever
+                    && templateString.length != lengthBefore) {
+                lengthBefore = templateString.length;
                 instructionsTypesLoop:
                 for (var i = 0; i < nInstructionTypes; i++) {
                     var token = instructionTypes[i],
@@ -155,7 +175,16 @@
                     break;
                 }
             }
-            return instructions;
+
+            if (keepLeftovers && templateString.length) {
+                return {
+                    partial: true,
+                    instructions: instructions,
+                    leftovers: templateString
+                };
+            } else {
+                return instructions;
+            }
         };
     }();
 
