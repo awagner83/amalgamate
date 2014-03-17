@@ -96,6 +96,16 @@ cases = [
         context: {thing: {value: 5}}
         expected: '5'
     }
+    {
+        name: 'replace with filter'
+        template: [
+            replace 'name|shout'
+        ]
+        context:
+            name: 'bob'
+            shout: (text) -> text.toUpperCase() + '!'
+        expected: 'BOB!'
+    }
 ]
 
 # Export list of tests

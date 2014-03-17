@@ -1,12 +1,22 @@
 (function (module) {
     'use strict';
 
-    var operations, render_internal, render, builders, compile;
+    var operations, render_internal, render, builders, compile, escape_html,
+        replace_chars, escape_char;
+
+    // Escape html chars
+    replace_chars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
+    escape_char = function (chr) {
+        return replaceChars[chr];
+    };
+    escape_html = function (str) {
+        return ('' + str).replace(/[&<>]/g, escape_char);
+    };
 
     /** Functionality behind instruction operations **/
     operations = {
         replace: function (ctx, data) {
-            return escape(ctx[data]);
+            return escape_html(ctx[data]);
         },
         deepReplace: function (ctx, data) {
             var result = ctx;
@@ -14,7 +24,15 @@
                 if (typeof result !== 'object') return '';
                 result = result[data[i]];
             }
-            return escape(result);
+            return escape_html(result);
+        },
+        filteredReplace: function (ctx, data) {
+            var result = operations.deepReplace(ctx, data.name),
+                filters = data.filters;
+            for (var i = 0, len = filters.length; i < len; i++) {
+                result = ctx[filters[i]](result);
+            }
+            return escape_html(result);
         },
         array: function (ctx, data) {
             var arr = ctx[data.array],
@@ -42,8 +60,17 @@
     /** Build individual operations to pass to 'render_internal' **/
     builders = {
         replace: function(name) {
-            var splitName = name.split('.');
-            if (splitName.length === 1)
+            var parts = name.split('|'),
+                namePart = parts[0],
+                filters = parts.slice(1),
+                splitName = namePart.split('.');
+
+            if (filters.length > 0)
+                return {
+                    op: operations.filteredReplace,
+                    data: { name: splitName, filters: filters }
+                };
+            else if (splitName.length === 1)
                 return { op: operations.replace, data: name };
             else
                 return { op: operations.deepReplace, data: splitName };

@@ -42,6 +42,14 @@ mkTests = ->
             mkMustache "{{name.last}}, {{name.first}}"
             mkUnderscore "<%=name.last %>, <%=name.first %>"
         ]
+    filterReplace:
+        context:
+            name: 'bob'
+            shout: (str) -> str.toUpperCase() + "!"
+        expected: "BOB!"
+        implementations: [
+            mkAmalgamate "{{name|shout}}"
+        ]
     ifSo:
         context: {isTrue: true}
         expected: "Yes, it's true"

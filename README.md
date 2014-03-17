@@ -2,8 +2,8 @@
 
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
-array-iteration, and existence-checking (both positive and negative)... all in 
-about 578 B (minified and gzipped)*
+array-iteration, filters, and existence-checking (both positive and
+negative)... all in about 657 B (minified and gzipped)*
 
 Run the benchmarks: `coffee bench.coffee`
 
@@ -42,12 +42,33 @@ Run the tests: `grunt nodeunit`
     {{^doesItExist}}
       Nope, it does.
     {{/doesItExist}}
+
+### Filters
+
+Filters functions can be supplied in the context.
+
+Template:
+
+    {{name|shout}}
+
+Context:
+
+    {
+        name: "bob",
+        shout: function (str) {
+            return str.toUpperCase() + "!";
+        }
+    }
+
+Output:
+
+    BOB!
   
 ------
 
 ### What's left to be done:
 
-- Lots of features need added (partials, helpers, inheritance, filters, etc.).
+- Lots of features need added (partials, helpers, inheritance, etc.).
 - Browser based template examples/try-it-out tool.
 - Browser benchmark support.
 - Split runtime from compiler (smaller runtime JavaScript)
