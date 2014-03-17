@@ -1,5 +1,5 @@
-
 (function (module) {
+    'use strict';
 
     var operations, render_internal, render, builders, compile;
 
@@ -11,7 +11,7 @@
         deepReplace: function (ctx, data) {
             var result = ctx;
             for (var i = 0, len = data.length; i < len; i++) {
-                if (typeof result !== 'object') return ''
+                if (typeof result !== 'object') return '';
                 result = result[data[i]];
             }
             return result;
@@ -19,7 +19,7 @@
         array: function (ctx, data) {
             var arr = ctx[data.array],
                 len = arr.length,
-                rendered = Array(len);
+                rendered = new Array(len);
             for (var i = 0; i < len; i++) {
                 rendered[i] = render_internal(data.template, arr[i]);
             }
@@ -85,7 +85,7 @@
                     return [string, ''];
                 }
                 return [string.slice(0, sliceTo), string.slice(sliceTo)];
-            }
+            };
         };
         var skip = function() {
             var skipParts = Array.prototype.slice.call(arguments, 0);
@@ -95,7 +95,7 @@
                     return ['', string.slice(skip.length)];
                 }
                 return false;
-            }
+            };
         };
         var not = function(cannotBe) {
             return function(string, collected) {
@@ -103,7 +103,7 @@
                     return [string.slice(0, 1), string.slice(1)];
                 }
                 return false;
-            }
+            };
         };
         var recurse = function(string, collected) {
             var result = compile(string, true);
@@ -158,9 +158,9 @@
             var instructions = [],
                 nInstructionTypes = instructionTypes.length,
                 lengthBefore = null;
-            while (templateString.length
+            while (templateString.length &&
                     // Ensure we never loop forever
-                    && templateString.length != lengthBefore) {
+                    templateString.length != lengthBefore) {
                 lengthBefore = templateString.length;
                 instructionsTypesLoop:
                 for (var i = 0; i < nInstructionTypes; i++) {
@@ -196,7 +196,7 @@
     /** Gory rendering details **/
     render_internal = function(compiled, context) {
         var len = compiled.length,
-            rendered = Array(compiled.length);
+            rendered = new Array(compiled.length);
         for (var i = 0; i < len; i++) {
             var x = compiled[i];
             if (typeof x === 'object') {
@@ -207,7 +207,7 @@
         }
 
         return rendered;
-    }
+    };
 
     /** Render compiled template with given context **/
     render = function(compiled, context) {
@@ -217,7 +217,7 @@
         }
 
         return render_internal(compiled, context).join('');
-    }
+    };
 
     var exports = {render: render, compile: compile, _builders: builders};
     if (module) module.exports = exports;
