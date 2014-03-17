@@ -50,6 +50,5 @@ Run the tests: `grunt nodeunit`
 - Lots of features need added (partials, helpers, inheritance, filters, etc.).
 - Browser based template examples/try-it-out tool.
 - Browser benchmark support.
-- Runtime tests
 - Split runtime from compiler (smaller runtime JavaScript)
 - Build tools to support creation of various build (full, full-min, runtime-only, runtime-only-min)
