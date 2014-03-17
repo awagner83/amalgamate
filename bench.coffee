@@ -24,9 +24,9 @@ mkTests = ->
         expected: "hello Bob, I'm Adam"
         implementations: [
             mkAmalgamate "hello {{you}}, I'm {{me}}"
-            mkDust "hello {you|s}, I'm {me|s}"
-            mkHandlebars "hello {{{you}}}, I'm {{{me}}}"
-            mkMustache "hello {{{you}}}, I'm {{{me}}}"
+            mkDust "hello {you}, I'm {me}"
+            mkHandlebars "hello {{you}}, I'm {{me}}"
+            mkMustache "hello {{you}}, I'm {{me}}"
             mkUnderscore "hello <%=you %>, I'm <%=me %>"
         ]
     dottedReplace:
@@ -37,9 +37,9 @@ mkTests = ->
         expected: "Smith, Bob"
         implementations: [
             mkAmalgamate "{{name.last}}, {{name.first}}"
-            mkDust "{name.last|s}, {name.first|s}"
-            mkHandlebars "{{{name.last}}}, {{{name.first}}}"
-            mkMustache "{{{name.last}}}, {{{name.first}}}"
+            mkDust "{name.last}, {name.first}"
+            mkHandlebars "{{name.last}}, {{name.first}}"
+            mkMustache "{{name.last}}, {{name.first}}"
             mkUnderscore "<%=name.last %>, <%=name.first %>"
         ]
     ifSo:
@@ -67,9 +67,9 @@ mkTests = ->
         expected: "people:"
         implementations: [
             mkAmalgamate "people:{{#people}}{{name}}, {{/people}}"
-            mkDust "people:{#people}{name|s}, {/people}"
-            mkHandlebars "people:{{#people}}{{{name}}}, {{/people}}"
-            mkMustache "people:{{#people}}{{{name}}}, {{/people}}"
+            mkDust "people:{#people}{name}, {/people}"
+            mkHandlebars "people:{{#people}}{{name}}, {{/people}}"
+            mkMustache "people:{{#people}}{{name}}, {{/people}}"
             mkUnderscore "people:<% for(var i = 0, len = people.length; i < len; i++) { %><%=people[i].name %>, <% } %>"
         ]
     array:
@@ -77,9 +77,9 @@ mkTests = ->
         expected: "bob, fred, jim, and others"
         implementations: [
             mkAmalgamate "{{#people}}{{name}}, {{/people}}and others"
-            mkDust "{#people}{name|s}, {/people}and others"
-            mkHandlebars "{{#people}}{{{name}}}, {{/people}}and others"
-            mkMustache "{{#people}}{{{name}}}, {{/people}}and others"
+            mkDust "{#people}{name}, {/people}and others"
+            mkHandlebars "{{#people}}{{name}}, {{/people}}and others"
+            mkMustache "{{#people}}{{name}}, {{/people}}and others"
             mkUnderscore "<% for(var i = 0, len = people.length; i < len; i++) { %><%=people[i].name %>, <% } %>and others"
         ]
     nestedArray:
@@ -101,9 +101,9 @@ mkTests = ->
         expected: "2 (4, 6, 8, ...); 3 (6, 9, 12, ...); 5 (10, 15, 20, ...); "
         implementations: [
             mkAmalgamate "{{#primes}}{{prime}} ({{#composites}}{{composite}}, {{/composites}}...); {{/primes}}"
-            mkDust "{#primes}{prime|s} ({#composites}{composite|s}, {/composites}...); {/primes}"
-            mkHandlebars "{{#primes}}{{{prime}}} ({{#composites}}{{{composite}}}, {{/composites}}...); {{/primes}}"
-            mkMustache "{{#primes}}{{{prime}}} ({{#composites}}{{{composite}}}, {{/composites}}...); {{/primes}}"
+            mkDust "{#primes}{prime} ({#composites}{composite}, {/composites}...); {/primes}"
+            mkHandlebars "{{#primes}}{{prime}} ({{#composites}}{{composite}}, {{/composites}}...); {{/primes}}"
+            mkMustache "{{#primes}}{{prime}} ({{#composites}}{{composite}}, {{/composites}}...); {{/primes}}"
             mkUnderscore "<% for(var i = 0, len = primes.length; i < len; i++) { %><%=primes[i].prime %> (<% for(var j = 0, jlen = primes[i].composites.length; j < jlen; j++) {%><%=primes[i].composites[j].composite %>, <% } %>...); <% } %>"
         ]
     object:
@@ -114,9 +114,9 @@ mkTests = ->
         expected: "Smith, Bob"
         implementations: [
             mkAmalgamate "{{@name}}{{last}}, {{first}}{{/name}}"
-            mkDust "{#name}{last|s}, {first|s}{/name}"
-            mkHandlebars "{{#name}}{{{last}}}, {{{first}}}{{/name}}"
-            mkMustache "{{#name}}{{{last}}}, {{{first}}}{{/name}}"
+            mkDust "{#name}{last}, {first}{/name}"
+            mkHandlebars "{{#name}}{{last}}, {{first}}{{/name}}"
+            mkMustache "{{#name}}{{last}}, {{first}}{{/name}}"
             mkUnderscore "<% var first = name.first, last = name.last %><%=last %>, <%=first%>"
         ]
     nestedObject:
@@ -127,7 +127,7 @@ mkTests = ->
         expected: "bob"
         implementations: [
             mkAmalgamate "{{@name}}{{@name}}{{first}}{{/name}}{{/name}}"
-            mkDust "{#name}{#name}{first|s}{/name}{/name}"
+            mkDust "{#name}{#name}{first}{/name}{/name}"
             mkHandlebars "{{#name}}{{#name}}{{first}}{{/name}}{{/name}}"
             mkMustache "{{#name}}{{#name}}{{first}}{{/name}}{{/name}}"
             mkUnderscore "<% var first = name.name.first, last = name.name.last %><%=first%>"

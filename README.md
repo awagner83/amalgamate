@@ -3,7 +3,7 @@
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, and existence-checking (both positive and negative)... all in 
-about 574 B (minified and gzipped)*
+about 578 B (minified and gzipped)*
 
 Run the benchmarks: `coffee bench.coffee`
 
@@ -50,8 +50,6 @@ Run the tests: `grunt nodeunit`
 - Lots of features need added (partials, helpers, inheritance, filters, etc.).
 - Browser based template examples/try-it-out tool.
 - Browser benchmark support.
-- Fixes to highly flawed benchmarks.
 - Runtime tests
 - Split runtime from compiler (smaller runtime JavaScript)
 - Build tools to support creation of various build (full, full-min, runtime-only, runtime-only-min)
-- Safe variable replacements (strip html from values)

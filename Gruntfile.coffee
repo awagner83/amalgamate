@@ -17,3 +17,5 @@ module.exports = (grunt) ->
                 files:
                     'amalgamate-min.js': ['amalgamate.js']
 
+    grunt.registerTask 'dist', ['nodeunit', 'jshint', 'uglify']
+

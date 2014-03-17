@@ -6,7 +6,7 @@
     /** Functionality behind instruction operations **/
     operations = {
         replace: function (ctx, data) {
-            return ctx[data];
+            return escape(ctx[data]);
         },
         deepReplace: function (ctx, data) {
             var result = ctx;
@@ -14,7 +14,7 @@
                 if (typeof result !== 'object') return '';
                 result = result[data[i]];
             }
-            return result;
+            return escape(result);
         },
         array: function (ctx, data) {
             var arr = ctx[data.array],
