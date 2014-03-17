@@ -53,12 +53,14 @@ Template:
 
 Context:
 
-    {
-        name: "bob",
-        shout: function (str) {
-            return str.toUpperCase() + "!";
-        }
+```javascript
+{
+    name: "bob",
+    shout: function (str) {
+        return str.toUpperCase() + "!";
     }
+}
+```
 
 Output:
 
