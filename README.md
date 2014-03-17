@@ -1,8 +1,13 @@
 ## amalgamate - a template library for javascript
 
-Run benchmarks: `coffee bench.coffee`
+**tldr;** *An experimental template library for javascript that supports
+context-vars replacements, deep-replace, object-scoping, array-iteration,
+and existence-checking (both positive and negative)... all in 574 B (minified
+and gzipped)*
 
-Run tests: `grunt nodeunit`
+Run the benchmarks: `coffee bench.coffee`
+
+Run the tests: `grunt nodeunit`
 
 ### Currently supported features:
 
@@ -42,11 +47,11 @@ Run tests: `grunt nodeunit`
 
 ### What's left to be done:
 
-- Lots of features need added (partials, helpers, inheritance, etc).
+- Lots of features need added (partials, helpers, inheritance, etc.).
 - Browser based template examples/try-it-out tool.
 - Browser benchmark support.
 - Fixes to highly flawed benchmarks.
 - Runtime tests
-- Split runtime from compiler (smaller runtime js)
+- Split runtime from compiler (smaller runtime JavaScript)
 - Build tools to support creation of various build (full, full-min, runtime-only, runtime-only-min)
 - Safe variable replacements (strip html from values)
