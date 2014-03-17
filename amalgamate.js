@@ -123,7 +123,12 @@
                     skip('{{/', 1, '}}')
                 ],
                 parse: function (parts) {
-                    return builder(parts[1], parts[3]);
+                    // Filter 'falsey' values from subtemplate
+                    var subTemplate = [];
+                    for (var i = 0, n = parts[3].length; i < n; i++) {
+                        if (parts[3][i]) subTemplate.push(parts[3][i]);
+                    }
+                    return builder(parts[1], subTemplate);
                 }
             };
         };
@@ -214,7 +219,7 @@
         return render_internal(compiled, context).join('');
     }
 
-    var exports = {render: render, compile: compile};
+    var exports = {render: render, compile: compile, _builders: builders};
     if (module) module.exports = exports;
     else        window.Amalgamate = exports;
 
