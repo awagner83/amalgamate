@@ -43,7 +43,7 @@ Run the tests: `grunt nodeunit`
       Nope, it does.
     {{/doesItExist}}
 
-### Filters
+#### Filters
 
 Filters functions can be supplied in the context.
 
