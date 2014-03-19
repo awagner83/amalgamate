@@ -3,7 +3,7 @@
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, filters, and existence-checking (both positive and
-negative)... all in about 657 B (minified and gzipped)*
+negative)... all in about 790 B (minified and gzipped)*
 
 Run the benchmarks: `coffee bench.coffee`
 
