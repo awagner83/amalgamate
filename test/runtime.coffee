@@ -1,12 +1,13 @@
 
-amalgamate = require '../amalgamate.js'
+amalgamate = require '../src/runtime.js'
+compiler = require '../src/compiler.js'
 
 # Short aliases to builders
-replace = amalgamate._builders.replace
-array   = amalgamate._builders.array
-object  = amalgamate._builders.object
-ifSo    = amalgamate._builders.ifSo
-ifNot   = amalgamate._builders.ifNot
+replace = compiler.builders.replace
+array   = compiler.builders.array
+object  = compiler.builders.object
+ifSo    = compiler.builders.ifSo
+ifNot   = compiler.builders.ifNot
 
 cases = [
     {

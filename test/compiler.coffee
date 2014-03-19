@@ -1,12 +1,12 @@
 
-amalgamate = require '../amalgamate.js'
+compiler = require '../src/compiler.js'
 
 # Short aliases to builders
-replace = amalgamate._builders.replace
-array   = amalgamate._builders.array
-object  = amalgamate._builders.object
-ifSo    = amalgamate._builders.ifSo
-ifNot   = amalgamate._builders.ifNot
+replace = compiler.builders.replace
+array   = compiler.builders.array
+object  = compiler.builders.object
+ifSo    = compiler.builders.ifSo
+ifNot   = compiler.builders.ifNot
 
 cases = [
     {
@@ -123,7 +123,7 @@ cases = [
 module.exports = {}
 cases.forEach (testCase) ->
     module.exports[testCase.name] = (test) ->
-        test.deepEqual (amalgamate.compile testCase.input), testCase.expected
+        test.deepEqual (compiler.compile testCase.input), testCase.expected
         test.expect 1
         test.done()
 

@@ -2,7 +2,7 @@
 Benchmark = require 'benchmark'
 _ = require 'underscore'
 
-amalgamate = require './amalgamate'
+amalgamate = require './index'
 Handlebars = require 'handlebars'
 dust = require 'dustjs-linkedin'
 mustache = require 'mustache'
