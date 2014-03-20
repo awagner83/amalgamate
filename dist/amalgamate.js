@@ -1,15 +1,17 @@
 (function(){function require(e,t){for(var n=[],r=e.split("/"),i,s,o=0;(s=r[o++])!=null;)".."==s?n.pop():"."!=s&&n.push(s);n=n.join("/"),o=require,s=o.m[t||0],i=s[n+".js"]||s[n+"/index.js"]||s[n],r='Cannot require("'+n+'")';if(!i)throw Error(r);if(s=i.c)i=o.m[t=s][e=i.m];if(!i)throw Error(r);return i.exports||i(i,i.exports={},function(n){return o("."!=n.charAt(0)?n:e+"/../"+n,t)}),i.exports};
 require.m = [];
 require.m[0] = { "index.js": function(module, exports, require){
+runtime = require('./src/runtime.js');
+
 module.exports = {
     compile: require('./src/compiler.js').compile,
-    render: require('./src/runtime.js').render
+    render: runtime.render,
+    load: runtime.load
 };
 
 },
 "src/compiler.js": function(module, exports, require){
 var runtime = require('./runtime.js');
-var operations = runtime._operations;
 
 /** Build individual operations to pass to 'render_internal' **/
 var builders = {
@@ -21,25 +23,25 @@ var builders = {
 
         if (filters.length > 0)
             return {
-                op: operations.filteredReplace,
+                op: 'filteredReplace',
                 data: { name: splitName, filters: filters }
             };
         else if (splitName.length === 1)
-            return { op: operations.replace, data: name };
+            return { op: 'replace', data: name };
         else
-            return { op: operations.deepReplace, data: splitName };
+            return { op: 'deepReplace', data: splitName };
     },
     array: function(array, template) {
-        return { op: operations.array, data: { array: array, template: template } };
+        return { op: 'array', data: { array: array, template: template } };
     },
     object: function(object, template) {
-        return { op: operations.object, data: { object: object, template: template } };
+        return { op: 'object', data: { object: object, template: template } };
     },
     ifSo: function(name, template) {
-        return { op: operations.ifSo, data: { name: name, template: template } };
+        return { op: 'ifSo', data: { name: name, template: template } };
     },
     ifNot: function(name, template) {
-        return { op: operations.ifNot, data: { name: name, template: template } };
+        return { op: 'ifNot', data: { name: name, template: template } };
     }
 };
 
@@ -262,9 +264,33 @@ render = function(compiled, context) {
     return render_internal(compiled, context).join('');
 };
 
+/** Load compiled template into something runnable **/
+load = function(frozen) {
+    var thawed = [];
+    for (var i = 0, len = frozen.length; i < len; i++) {
+        if (typeof frozen[i] === 'object') {
+            var instruction = frozen[i],
+                opFn = operations[instruction.op];
+            if (instruction.data && instruction.data.template) {
+                var newData = {};
+                for (var key in instruction.data) {
+                    newData[key] = instruction.data[key];
+                }
+                newData.template = load(newData.template);
+                thawed.push({op: opFn, data: newData});
+            } else {
+                thawed.push({op: opFn, data: instruction.data});
+            }
+        } else {
+            thawed.push(frozen[i]);
+        }
+    }
+    return thawed;
+};
+
 module.exports = {
     render: render,
-    _operations: operations
+    load: load
 };
 
 }};

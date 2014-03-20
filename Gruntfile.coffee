@@ -17,12 +17,19 @@ module.exports = (grunt) ->
             all:
                 files:
                     'dist/amalgamate-min.js': ['dist/amalgamate.js']
+                    'dist/amalgamate-runtime-min.js': ['dist/amalgamate-runtime.js']
         gluejs:
-            dist:
+            full:
                 options:
                     export: 'Amalgamate'
                 dest: 'dist/amalgamate.js'
                 src: ['index.js', 'src/*.js']
+            runtime:
+                options:
+                    main: 'src/runtime.js'
+                    export: 'Amalgamate'
+                dest: 'dist/amalgamate-runtime.js'
+                src: ['src/runtime.js']
 
     grunt.registerTask 'dist', ['nodeunit', 'jshint', 'gluejs', 'uglify']
 

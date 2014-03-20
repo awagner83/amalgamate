@@ -113,7 +113,7 @@ cases = [
 module.exports = {}
 cases.forEach (testCase) ->
     module.exports[testCase.name] = (test) ->
-        actual = amalgamate.render testCase.template, testCase.context
+        actual = amalgamate.render (amalgamate.load testCase.template), testCase.context
         test.deepEqual actual, testCase.expected
         test.expect 1
         test.done()

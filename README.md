@@ -3,13 +3,13 @@
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, filters, and existence-checking (both positive and
-negative)... all in about 790 B (minified and gzipped)*
+negative)... all in about 424 B (runtime only, minified and gzipped)*
 
 Run the benchmarks: `coffee bench.coffee`
 
 Run the tests: `grunt nodeunit`
 
-### Currently supported features:
+### Features:
 
 #### Replace
 
@@ -65,6 +65,11 @@ Context:
 Output:
 
     BOB!
+
+#### Portable Compiled Templates
+
+Compiled templates are valid JSON data and can be loaded and used anywhere
+the runtime is included (without `eval`ing javascript).
   
 ------
 

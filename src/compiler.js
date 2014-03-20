@@ -1,6 +1,5 @@
 
 var runtime = require('./runtime.js');
-var operations = runtime._operations;
 
 /** Build individual operations to pass to 'render_internal' **/
 var builders = {
@@ -12,25 +11,25 @@ var builders = {
 
         if (filters.length > 0)
             return {
-                op: operations.filteredReplace,
+                op: 'filteredReplace',
                 data: { name: splitName, filters: filters }
             };
         else if (splitName.length === 1)
-            return { op: operations.replace, data: name };
+            return { op: 'replace', data: name };
         else
-            return { op: operations.deepReplace, data: splitName };
+            return { op: 'deepReplace', data: splitName };
     },
     array: function(array, template) {
-        return { op: operations.array, data: { array: array, template: template } };
+        return { op: 'array', data: { array: array, template: template } };
     },
     object: function(object, template) {
-        return { op: operations.object, data: { object: object, template: template } };
+        return { op: 'object', data: { object: object, template: template } };
     },
     ifSo: function(name, template) {
-        return { op: operations.ifSo, data: { name: name, template: template } };
+        return { op: 'ifSo', data: { name: name, template: template } };
     },
     ifNot: function(name, template) {
-        return { op: operations.ifNot, data: { name: name, template: template } };
+        return { op: 'ifNot', data: { name: name, template: template } };
     }
 };
 

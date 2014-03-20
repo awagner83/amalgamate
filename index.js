@@ -1,6 +1,9 @@
 
+runtime = require('./src/runtime.js');
+
 module.exports = {
     compile: require('./src/compiler.js').compile,
-    render: require('./src/runtime.js').render
+    render: runtime.render,
+    load: runtime.load
 };
 

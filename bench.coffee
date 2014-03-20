@@ -145,8 +145,7 @@ mkTests = ->
 
 mkAmalgamate = (template) ->
     name: 'amalgamate'
-    compile: ->
-        amalgamate.compile template
+    compile: -> amalgamate.load (amalgamate.compile template)
     run: (compiled, context) -> amalgamate.render compiled, context
 
 mkHandlebars = (template) ->
