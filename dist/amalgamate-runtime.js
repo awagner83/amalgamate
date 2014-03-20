@@ -4,12 +4,17 @@ require.m[0] = { "src/runtime.js": function(module, exports, require){
 var operations, render_internal, render, escape_html, replace_chars, escape_char;
 
 // Escape html chars
+replace_regex = /[&<>]/g;
 replace_chars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
 escape_char = function (chr) {
     return replaceChars[chr];
 };
 escape_html = function (str) {
-    return ('' + str).replace(/[&<>]/g, escape_char);
+    if (replace_regex.test(str)) {
+        return ('' + str).replace(replace_regex, escape_char);
+    } else {
+        return str;
+    }
 };
 
 /** Functionality behind instruction operations **/
@@ -53,7 +58,6 @@ operations = {
         if (!ctx[data.name]) return render(data.template, ctx);
         return '';
     }
-
 };
 
 /** Gory rendering details **/
