@@ -26,10 +26,8 @@ var builders = {
                 op: 'filteredReplace',
                 data: { name: splitName, filters: filters }
             };
-        else if (splitName.length === 1)
-            return { op: 'replace', data: name };
         else
-            return { op: 'deepReplace', data: splitName };
+            return { op: 'replace', data: splitName };
     },
     array: function(array, template) {
         return { op: 'array', data: { array: array, template: template } };
@@ -202,31 +200,24 @@ escape_html = function (str) {
 /** Functionality behind instruction operations **/
 operations = {
     replace: function (ctx, data) {
-        return escape_html(ctx[data]);
-    },
-    deepReplace: function (ctx, data) {
         var result = ctx;
-        for (var i = 0, len = data.length; i < len; i++) {
-            if (typeof result !== 'object') return '';
-            result = result[data[i]];
-        }
+        for (var i = 0, len = data.length; i < len; i++)
+            result = result && result[data[i]];
         return escape_html(result);
     },
     filteredReplace: function (ctx, data) {
-        var result = operations.deepReplace(ctx, data.name),
+        var result = operations.replace(ctx, data.name),
             filters = data.filters;
-        for (var i = 0, len = filters.length; i < len; i++) {
+        for (var i = 0, len = filters.length; i < len; i++)
             result = ctx[filters[i]](result);
-        }
         return escape_html(result);
     },
     array: function (ctx, data) {
         var arr = ctx[data.array],
             len = arr.length,
             rendered = new Array(len);
-        for (var i = 0; i < len; i++) {
+        for (var i = 0; i < len; i++)
             rendered[i] = render_internal(data.template, arr[i]);
-        }
         return Array.prototype.concat.apply([], rendered).join('');
     },
     object: function (ctx, data) {

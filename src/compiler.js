@@ -14,10 +14,8 @@ var builders = {
                 op: 'filteredReplace',
                 data: { name: splitName, filters: filters }
             };
-        else if (splitName.length === 1)
-            return { op: 'replace', data: name };
         else
-            return { op: 'deepReplace', data: splitName };
+            return { op: 'replace', data: splitName };
     },
     array: function(array, template) {
         return { op: 'array', data: { array: array, template: template } };
