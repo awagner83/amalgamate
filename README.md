@@ -5,6 +5,10 @@ that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, filters, and existence-checking (both positive and
 negative)... all in about 415 B (runtime only, minified and gzipped)*
 
+---
+
+Try it out: http://awagner83.github.io/amalgamate/
+
 Run the benchmarks: `coffee bench.coffee`
 
 Run the tests: `grunt nodeunit`
