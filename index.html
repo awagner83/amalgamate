@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset='utf-8'>
+    <title>Try Amalgamate!</title>
+    <link href='web/bootstrap.min.css' rel='stylesheet'>
+    <style>
+        textarea, pre {width: 100%; height: 15em}
+    </style>
+    </head>
+    <body>
+
+    <div class='container'>
+        <h1>Try Amalgamate!</h1>
+
+        <div class='row'>
+            <div class='col-md-4'>
+                <h2>Template</h2>
+                <textarea id='template'>hello {{where}}!</textarea>
+            </div>
+            <div class='col-md-4'>
+                <h2>Context</h2>
+                <textarea id='context'>{"where": "world"}</textarea>
+            </div>
+            <div class='col-md-4'>
+                <h2>Output</h2>
+                <pre id='output'></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src='dist/amalgamate-min.js'></script>
+    <script src='web/jquery.min.js'></script>
+    <script src='web/bootstrap.min.js'></script>
+    <script type='text/javascript'>
+        var render = function() {
+            var out = $("#output");
+            try {
+                var context = JSON.parse($("#context").val());
+            } catch (ex) {
+                return out.html("Invalid JSON");
+            }
+            var template = Amalgamate.load(Amalgamate.compile($("#template").val()));
+            out.html(Amalgamate.render(template, context));
+        };
+
+        $('#context,#template').keyup(render);
+        render();
+    </script>
+    </body>
+</html>
