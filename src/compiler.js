@@ -9,13 +9,10 @@ var builders = {
             filters = parts.slice(1),
             splitName = namePart.split('.');
 
-        if (filters.length > 0)
-            return {
-                op: 'filteredReplace',
-                data: { name: splitName, filters: filters }
-            };
-        else
-            return { op: 'replace', data: splitName };
+        return {
+            op: 'replace',
+            data: { name: splitName, filters: filters }
+        };
     },
     array: function(array, template) {
         return { op: 'array', data: { array: array, template: template } };

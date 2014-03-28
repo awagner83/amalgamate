@@ -20,16 +20,18 @@ escape_html = function (str) {
 /** Functionality behind instruction operations **/
 operations = {
     replace: function (ctx, data) {
-        var result = ctx;
-        for (var i = 0, len = data.length; i < len; i++)
-            result = result && result[data[i]];
-        return escape_html(result);
-    },
-    filteredReplace: function (ctx, data) {
-        var result = operations.replace(ctx, data.name),
+        var result  = ctx,
+            name    = data.name,
             filters = data.filters;
-        for (var i = 0, len = filters.length; i < len; i++)
-            result = ctx[filters[i]](result);
+
+        // Traverse to value
+        for (var i = 0, len = name.length; i < len; i++)
+            result = result && result[name[i]];
+
+        // Apply filters
+        for (var j = 0, jlen = filters.length; j < jlen; j++)
+            result = ctx[filters[j]](result);
+
         return escape_html(result);
     },
     array: function (ctx, data) {
