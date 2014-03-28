@@ -14,17 +14,24 @@ var builders = {
             data: { name: splitName, filters: filters }
         };
     },
-    array: function(array, template) {
-        return { op: 'array', data: { array: array, template: template } };
+    array: function(array, tpl) {
+        return { op: 'array', data: { array: array, tpl: tpl } };
     },
-    object: function(object, template) {
-        return { op: 'object', data: { object: object, template: template } };
+    object: function(object, tpl) {
+        var parts = object.split('|'),
+            name = parts[0],
+            filters = parts.slice(1);
+
+        return {
+            op: 'object',
+            data: { object: name, tpl: tpl, filters: filters }
+        };
     },
-    ifSo: function(name, template) {
-        return { op: 'ifSo', data: { name: name, template: template } };
+    ifSo: function(name, tpl) {
+        return { op: 'ifSo', data: { name: name, tpl: tpl } };
     },
-    ifNot: function(name, template) {
-        return { op: 'ifNot', data: { name: name, template: template } };
+    ifNot: function(name, tpl) {
+        return { op: 'ifNot', data: { name: name, tpl: tpl } };
     }
 };
 
@@ -86,7 +93,9 @@ var compile = function() {
                 until('}}'),
                 skip('}}'),
                 recurse,
-                skip('{{/', 1, '}}')
+                skip('{{/'),
+                until('}}'),
+                skip('}}')
             ],
             parse: function (parts) {
                 // Filter 'falsey' values from subtemplate

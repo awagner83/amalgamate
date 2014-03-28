@@ -15,20 +15,26 @@ escape_html = function (str) {
     }
 };
 
+// Filter application
+var filter = function(val, ctx, filters) {
+    for (var i = 0, len = filters.length; i < len; i++)
+        val = ctx[filters[i]](val);
+    return val;
+};
+
 /** Functionality behind instruction operations **/
 operations = {
     replace: function (ctx, data) {
         var result  = ctx,
-            name    = data.name,
-            filters = data.filters;
+            name    = data.name;
 
         // Traverse to value
         for (var i = 0, len = name.length; i < len; i++)
             result = result && result[name[i]];
 
         // Apply filters
-        for (var j = 0, jlen = filters.length; j < jlen; j++)
-            result = ctx[filters[j]](result);
+        if (data.filters.length)
+            result = filter(result, ctx, data.filters);
 
         return escape_html(result);
     },
@@ -37,19 +43,17 @@ operations = {
             len = arr.length,
             rendered = new Array(len);
         for (var i = 0; i < len; i++)
-            rendered[i] = render_internal(data.template, arr[i]);
-        return Array.prototype.concat.apply([], rendered).join('');
+            rendered[i] = render_internal(data.tpl, arr[i]);
+        return [].concat.apply([], rendered).join('');
     },
     object: function (ctx, data) {
-        return render(data.template, ctx[data.object]);
+        return render(data.tpl, filter(ctx[data.object], ctx, data.filters));
     },
     ifSo: function (ctx, data) {
-        if (ctx[data.name]) return render(data.template, ctx);
-        return '';
+        return (ctx[data.name] && render(data.tpl, ctx)) || '';
     },
     ifNot: function (ctx, data) {
-        if (!ctx[data.name]) return render(data.template, ctx);
-        return '';
+        return (!ctx[data.name] && render(data.tpl, ctx)) || '';
     }
 };
 
@@ -86,12 +90,12 @@ load = function(frozen) {
         if (typeof frozen[i] === 'object') {
             var instruction = frozen[i],
                 opFn = operations[instruction.op];
-            if (instruction.data && instruction.data.template) {
+            if (instruction.data && instruction.data.tpl) {
                 var newData = {};
                 for (var key in instruction.data) {
                     newData[key] = instruction.data[key];
                 }
-                newData.template = load(newData.template);
+                newData.tpl = load(newData.tpl);
                 thawed.push({op: opFn, data: newData});
             } else {
                 thawed.push({op: opFn, data: instruction.data});

@@ -3,7 +3,7 @@
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, filters, and existence-checking (both positive and
-negative)... all in about 410 B (runtime only, minified and gzipped)*
+negative)... all in about 416 B (runtime only, minified and gzipped)*
 
 Run the benchmarks: `coffee bench.coffee`
 
@@ -24,6 +24,14 @@ Run the tests: `grunt nodeunit`
     {{@myObject}}
       {{someProperty}}
     {{/myObject}}
+
+Or simply:
+
+    {{@myObject}}
+      {{someProperty}}
+    {{/}}
+
+This works for all block-style instructions
   
 #### Array Iteration
 
@@ -65,6 +73,29 @@ Context:
 Output:
 
     BOB!
+
+Filters can also be applied to values used for object scoping:
+
+    {{@fullName|splitName}}
+        {{last}}, {{first}}
+    {{/fullName}}
+
+Context:
+
+```javascript
+{
+    fullName: "Bob Smith",
+    splitName: function (name) {
+        var parts = name.split(' ');
+        return {first: parts[0], last: parts[1]};
+    }
+}
+```
+
+Output:
+
+    Smith, Bob
+
 
 #### Portable Compiled Templates
 

@@ -36,6 +36,13 @@ cases = [
         ]
     }
     {
+        name: 'array with static text (and empty end tag)'
+        input: '{{#thing}}found a thing{{/}}'
+        expected: [
+            array 'thing', ['found a thing']
+        ]
+    }
+    {
         name: 'array with replacement'
         input: '{{#things}}{{thing}}{{/things}}'
         expected: [
@@ -70,6 +77,17 @@ cases = [
         input: '{{@thing}}inside my thing{{/thing}}'
         expected: [
             object 'thing', ['inside my thing']
+        ]
+    }
+    {
+        name: 'object with filter'
+        input: '{{@name|split}}{{last}}, {{first}}{{/name}}'
+        expected: [
+            object 'name|split', [
+                replace 'last'
+                ', '
+                replace 'first'
+            ]
         ]
     }
     {

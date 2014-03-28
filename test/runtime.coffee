@@ -107,6 +107,22 @@ cases = [
             shout: (text) -> text.toUpperCase() + '!'
         expected: 'BOB!'
     }
+    {
+        name: 'object with filter'
+        template: [
+            object 'name|fullName', [
+                replace 'last'
+                ', '
+                replace 'first'
+            ]
+        ]
+        context:
+            name: 'bob smith'
+            fullName: (name) ->
+                [first, last] = name.split ' '
+                first: first, last: last
+        expected: 'smith, bob'
+    }
 ]
 
 # Export list of tests
