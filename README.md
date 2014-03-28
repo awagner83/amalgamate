@@ -111,7 +111,6 @@ the runtime is included (without `eval`ing javascript).
 ### What's left to be done:
 
 - Lots of features need added (partials, helpers, inheritance, etc.).
-- Browser based template examples/try-it-out tool.
+- Browser based template examples.
 - Browser benchmark support.
-- Split runtime from compiler (smaller runtime JavaScript)
 - Build tools to support creation of various build (full, full-min, runtime-only, runtime-only-min)
