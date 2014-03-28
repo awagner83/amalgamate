@@ -5,7 +5,7 @@
     <title>Try Amalgamate!</title>
     <link href='web/bootstrap.min.css' rel='stylesheet'>
     <style>
-        textarea, pre {width: 100%; height: 15em}
+        textarea, pre {width: 100%; height: 15em; font-family: monospace}
     </style>
     </head>
     <body>
@@ -13,35 +13,50 @@
     <div class='container'>
         <h1>Try Amalgamate!</h1>
 
+        <p>For more information, checkout the readme at <a href='https://github.com/awagner83/amalgamate'>github</a>.</p>
+
         <div class='row'>
             <div class='col-md-4'>
-                <h2>Template</h2>
+                <h3>Template</h3>
                 <textarea id='template'>hello {{where}}!</textarea>
             </div>
             <div class='col-md-4'>
-                <h2>Context</h2>
+                <h3>Context</h3>
                 <textarea id='context'>{"where": "world"}</textarea>
             </div>
             <div class='col-md-4'>
-                <h2>Output</h2>
+                <h3>Raw Output</h3>
                 <pre id='output'></pre>
+                <div id='time'></div>
             </div>
         </div>
+
+        <h3>HTML Output</h3>
+        <div class='well' id='htmlOutput'></div>
     </div>
 
     <script src='dist/amalgamate-min.js'></script>
     <script src='web/jquery.min.js'></script>
     <script src='web/bootstrap.min.js'></script>
     <script type='text/javascript'>
+
         var render = function() {
             var out = $("#output");
+            var htmlout = $("#htmlOutput");
+            var time = $("#time");
             try {
                 var context = JSON.parse($("#context").val());
             } catch (ex) {
                 return out.html("Invalid JSON");
             }
-            var template = Amalgamate.load(Amalgamate.compile($("#template").val()));
-            out.html(Amalgamate.render(template, context));
+            var template = Amalgamate.load(Amalgamate.compile($("#template").val())),
+                start = performance.now(),
+                output = Amalgamate.render(template, context),
+                end = performance.now();
+
+            out.html(output.replace(/</g, '&lt;'));
+            htmlout.html(output);
+            time.html("Template rendered in " + (end - start) + "ms");
         };
 
         $('#context,#template').keyup(render);
