@@ -113,4 +113,3 @@ the runtime is included (without `eval`ing javascript).
 - Lots of features need added (partials, helpers, inheritance, etc.).
 - Browser based template examples.
 - Browser benchmark support.
-- Build tools to support creation of various build (full, full-min, runtime-only, runtime-only-min)
