@@ -62,7 +62,7 @@ operations = {
 /** Gory rendering details **/
 render_internal = function(compiled, context) {
     var len = compiled.length,
-        rendered = new Array(compiled.length);
+        rendered = new Array(len);
     for (var i = 0; i < len; i++) {
         var x = compiled[i];
         if (typeof x === 'object') {
