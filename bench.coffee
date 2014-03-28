@@ -29,6 +29,17 @@ mkTests = ->
             mkMustache "hello {{you}}, I'm {{me}}"
             mkUnderscore "hello <%=you %>, I'm <%=me %>"
         ]
+    bigReplace:
+        context:
+            a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12, m: 13, n: 14, o: 15, p: 16, q: 17, r: 18, s: 19, t: 20
+        expected: "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20"
+        implementations: [
+            mkAmalgamate "{{a}} {{b}} {{c}} {{d}} {{e}} {{f}} {{g}} {{h}} {{i}} {{j}} {{k}} {{l}} {{m}} {{n}} {{o}} {{p}} {{q}} {{r}} {{s}} {{t}}"
+            mkDust "{a} {b} {c} {d} {e} {f} {g} {h} {i} {j} {k} {l} {m} {n} {o} {p} {q} {r} {s} {t}"
+            mkHandlebars "{{a}} {{b}} {{c}} {{d}} {{e}} {{f}} {{g}} {{h}} {{i}} {{j}} {{k}} {{l}} {{m}} {{n}} {{o}} {{p}} {{q}} {{r}} {{s}} {{t}}"
+            mkMustache "{{a}} {{b}} {{c}} {{d}} {{e}} {{f}} {{g}} {{h}} {{i}} {{j}} {{k}} {{l}} {{m}} {{n}} {{o}} {{p}} {{q}} {{r}} {{s}} {{t}}"
+            mkUnderscore "<%=a %> <%=b %> <%=c %> <%=d %> <%=e %> <%=f %> <%=g %> <%=h %> <%=i %> <%=j %> <%=k %> <%=l %> <%=m %> <%=n %> <%=o %> <%=p %> <%=q %> <%=r %> <%=s %> <%=t %>"
+        ]
     dottedReplace:
         context:
             name:
