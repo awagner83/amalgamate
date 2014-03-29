@@ -5,7 +5,8 @@
     <title>Try Amalgamate!</title>
     <link href='web/bootstrap.min.css' rel='stylesheet'>
     <style>
-        textarea, pre {width: 100%; height: 15em; font-family: monospace}
+        textarea, pre {width: 100%; height: 20em; font-family: monospace}
+        pre {width: 100%; height: 17em; font-family: monospace}
     </style>
     </head>
     <body>
@@ -15,19 +16,21 @@
 
         <p>For more information, checkout the readme at <a href='https://github.com/awagner83/amalgamate'>github</a>.</p>
 
+        <select id='example' class='form-control input-lg'></select>
+
         <div class='row'>
             <div class='col-md-4'>
                 <h3>Template</h3>
-                <textarea id='template'>hello {{where}}!</textarea>
+                <textarea id='template'></textarea>
             </div>
             <div class='col-md-4'>
                 <h3>Context</h3>
-                <textarea id='context'>{"where": "world"}</textarea>
+                <textarea id='context'></textarea>
             </div>
             <div class='col-md-4'>
                 <h3>Raw Output</h3>
                 <pre id='output'></pre>
-                <div id='time'></div>
+                <div id='time' class='alert alert-success'></div>
             </div>
         </div>
 
@@ -39,6 +42,64 @@
     <script src='web/jquery.min.js'></script>
     <script src='web/bootstrap.min.js'></script>
     <script type='text/javascript'>
+
+        var examples = [
+            {
+                'name': 'Replace',
+                'template': 'Hello {{where}}!',
+                'context': {where: 'World'}
+            },
+            {
+                'name': 'Deep Replace',
+                'template': 'Hello {{thisPlace.where}}!',
+                'context': {thisPlace: {where: 'The Internet'}}
+            },
+            {
+                'name': 'Object Scoping',
+                'template': 'Hello {{@person}}{{firstName}} {{lastName}}{{/person}}!',
+                'context': {person: {firstName: 'Bob', lastName: 'Smith'}}
+            },
+            {
+                'name': 'Array Iteration',
+                'template': '{{#people}}{{firstName}} {{lastName}}<br>{{/people}}',
+                'context': {people: [
+                    {firstName: 'Bob', lastName: 'Smith'},
+                    {firstName: 'Judy', lastName: 'Smith'}
+                ]}
+            },
+            {
+                'name': 'Existence Check',
+                'template': '{{#people}}\n  {{?child}}Little {{/child}}\n\  {{firstName}} {{lastName}}<br>\n{{/people}}',
+                'context': {people: [
+                    {firstName: 'Bob', lastName: 'Smith'},
+                    {firstName: 'Bobby', lastName: 'Smith', child: true},
+                    {firstName: 'Judy', lastName: 'Smith'}
+                ]}
+            },
+            {
+                'name': 'Inverse Existing Check',
+                'template': '{{^people}}No people here.{{/people}}',
+                'context': {}
+            }
+        ];
+
+        var examplesIndex = {};
+        for (var i = 0, len = examples.length; i < len; i++) {
+            examplesIndex[examples[i].name] = examples[i];
+        }
+
+        var populateExampleBox = function() {
+            var tpl = Amalgamate.load(Amalgamate.compile(
+                        "{{#examples}}<option value='{{name}}'>{{name}}</option>{{/examples}}"));
+            $('#example').html(Amalgamate.render(tpl, {examples: examples}));
+        };
+
+        var updateContextAndTemplate = function() {
+            var selected = examplesIndex[$('#example').val()];
+            $('#template').html(selected.template);
+            $('#context').html(JSON.stringify(selected.context, null, 4));
+            render();
+        };
 
         var render = function() {
             var out = $("#output");
@@ -56,11 +117,14 @@
 
             out.html(output.replace(/</g, '&lt;'));
             htmlout.html(output);
-            time.html("Template rendered in " + (end - start) + "ms");
+            time.html("Template rendered in <b>" + (end - start).toFixed(3) + "ms</b>");
         };
 
+        $('#example').change(updateContextAndTemplate);
         $('#context,#template').keyup(render);
-        render();
+
+        populateExampleBox();
+        updateContextAndTemplate();
     </script>
     </body>
 </html>
