@@ -52,10 +52,12 @@ operations = {
         return render(data.tpl, filter(ctx[data.object], ctx, data.filters));
     },
     ifSo: function (ctx, data) {
-        return (ctx[data.name] && render(data.tpl, ctx)) || '';
+        return (ctx[data.name] && render(data.tpl, ctx)) ||
+            (data.elseTpl && render(data.elseTpl, ctx)) || '';
     },
     ifNot: function (ctx, data) {
-        return (!ctx[data.name] && render(data.tpl, ctx)) || '';
+        return (!ctx[data.name] && render(data.tpl, ctx)) ||
+            (data.elseTpl && render(data.elseTpl, ctx)) || '';
     }
 };
 

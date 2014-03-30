@@ -66,10 +66,24 @@ cases = [
         ]
     }
     {
+        name: 'existence check with else'
+        input: '{{?things}}true{{:else}}false{{/things}}'
+        expected: [
+            ifSo 'things', ['true'], ['false']
+        ]
+    }
+    {
         name: 'inverse existence check with static test'
         input: '{{^thing}}thing does not exist!{{/thing}}'
         expected: [
             ifNot 'thing', ['thing does not exist!']
+        ]
+    }
+    {
+        name: 'inverse existence check with else'
+        input: '{{^things}}true{{:else}}false{{/things}}'
+        expected: [
+            ifNot 'things', ['true'], ['false']
         ]
     }
     {

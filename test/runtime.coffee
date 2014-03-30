@@ -66,6 +66,14 @@ cases = [
         expected: ''
     }
     {
+        name: 'existence check with static text (no value found, but with else)'
+        template: [
+            ifSo 'thing', ['thing exists!'], ['thing does not exist']
+        ]
+        context: {someOtherThing: 'some value'}
+        expected: 'thing does not exist'
+    }
+    {
         name: 'inverse existence check with static text'
         template: [
             ifNot 'thing', ['thing does not exist']
@@ -80,6 +88,14 @@ cases = [
         ]
         context: {thing: 'some value'}
         expected: ''
+    }
+    {
+        name: 'inverse existence check with static text (value found, but with else)'
+        template: [
+            ifNot 'thing', ['thing does not exist'], ['thing does exist']
+        ]
+        context: {thing: 'some value'}
+        expected: 'thing does exist'
     }
     {
         name: 'object scoping'

@@ -3,7 +3,7 @@
 **tldr;** *An experimental (and hopefully fast) template library for javascript
 that supports context-var replacements, deep-replace, object-scoping,
 array-iteration, filters, and existence-checking (both positive and
-negative)... all in about 415 B (runtime only, minified and gzipped)*
+negative)... all in about 424 B (runtime only, minified and gzipped)*
 
 ---
 
@@ -112,6 +112,8 @@ the runtime is included (without `eval`ing javascript).
 
 ### What's left to be done:
 
-- Lots of features need added (partials, helpers, inheritance, etc.).
-- Browser based template examples.
-- Browser benchmark support.
+- Partials
+- Inheritance
+- Helpers (or equiv support via filters)
+- Block-style filters
+- Other missing features that I'm not thinking of.

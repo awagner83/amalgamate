@@ -39,11 +39,11 @@ var builders = {
             data: { object: name, tpl: tpl, filters: filters }
         };
     },
-    ifSo: function(name, tpl) {
-        return { op: 'ifSo', data: { name: name, tpl: tpl } };
+    ifSo: function(name, tpl, elseTpl) {
+        return { op: 'ifSo', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
     },
-    ifNot: function(name, tpl) {
-        return { op: 'ifNot', data: { name: name, tpl: tpl } };
+    ifNot: function(name, tpl, elseTpl) {
+        return { op: 'ifNot', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
     }
 };
 
@@ -98,24 +98,40 @@ var compile = function() {
             return [result, ''];
         }
     };
-    var blockInstruction = function(prefix, builder) {
-        return {
-            rule: [
-                skip('{{' + prefix),
-                until('}}'),
-                skip('}}'),
+    var filterFalsey = function(parts) {
+        var template = [];
+        for (var i = 0, n = parts.length; i < n; i++)
+            if (parts[i]) template.push(parts[i]);
+        return template;
+    };
+    var blockInstruction = function(prefix, builder, hasElse) {
+        var rule;
+        if (hasElse) {
+            rule =  [
+                skip('{{' + prefix), until('}}'), skip('}}'),
                 recurse,
-                skip('{{/'),
-                until('}}'),
-                skip('}}')
-            ],
+                skip('{{:else}}'),
+                recurse,
+                skip('{{/'), until('}}'), skip('}}')
+            ];
+        } else {
+            rule =  [
+                skip('{{' + prefix), until('}}'), skip('}}'),
+                recurse,
+                skip('{{/'), until('}}'), skip('}}')
+            ];
+        }
+        return {
+            rule: rule,
             parse: function (parts) {
-                // Filter 'falsey' values from subtemplate
-                var subTemplate = [];
-                for (var i = 0, n = parts[3].length; i < n; i++) {
-                    if (parts[3][i]) subTemplate.push(parts[3][i]);
+                var subTemplate = filterFalsey(parts[3]);
+
+                var elseTemplate;
+                if (hasElse) {
+                    console.log(parts[5]);
+                    elseTemplate = filterFalsey(parts[5]);
                 }
-                return builder(parts[1], subTemplate);
+                return builder(parts[1], subTemplate, elseTemplate);
             }
         };
     };
@@ -123,11 +139,13 @@ var compile = function() {
         blockInstruction('#', builders.array),
         blockInstruction('@', builders.object),
         blockInstruction('?', builders.ifSo),
+        blockInstruction('?', builders.ifSo, true),
         blockInstruction('^', builders.ifNot),
+        blockInstruction('^', builders.ifNot, true),
 
         // Replacements
         {
-            rule: [skip('{{'), not('#@?^/'), until('}}'), skip('}}')],
+            rule: [skip('{{'), not('#@?^/:'), until('}}'), skip('}}')],
             parse: function (parts) {
                 return builders.replace(parts[1] + parts[2]);
             }
@@ -238,10 +256,12 @@ operations = {
         return render(data.tpl, filter(ctx[data.object], ctx, data.filters));
     },
     ifSo: function (ctx, data) {
-        return (ctx[data.name] && render(data.tpl, ctx)) || '';
+        return (ctx[data.name] && render(data.tpl, ctx)) ||
+            (data.elseTpl && render(data.elseTpl, ctx)) || '';
     },
     ifNot: function (ctx, data) {
-        return (!ctx[data.name] && render(data.tpl, ctx)) || '';
+        return (!ctx[data.name] && render(data.tpl, ctx)) ||
+            (data.elseTpl && render(data.elseTpl, ctx)) || '';
     }
 };
 
