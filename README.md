@@ -112,6 +112,8 @@ the runtime is included (without `eval`ing javascript).
 
 ### What's left to be done:
 
-- Lots of features need added (partials, helpers, inheritance, etc.).
-- Browser based template examples.
-- Browser benchmark support.
+- Partials
+- Inheritance
+- Helpers (or equiv support via filters)
+- Block-style filters
+- Other missing features that I'm not thinking of.
