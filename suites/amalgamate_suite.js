@@ -43,12 +43,12 @@ var benches = {
              "    {{#items}}\n"                                    +
              "      {{?current}}\n"                                +
              "        <li><strong>{{name}}</strong></li>\n"        +
-             "      {{/current}}{{^current}}\n"                    +
+             "      {{:else}}\n"                                   +
              "        <li><a href=\"{{url}}\">{{name}}</a></li>\n" +
              "      {{/current}}\n"                                +
              "    {{/items}}\n"                                    +
              "  </ul>\n"                                           +
-             "{{/items}}{{^items}}\n"                              +
+             "{{:else}}\n"                                         +
              "  <p>The list is empty.</p>\n"                       +
              "{{/items}}",
     context: {

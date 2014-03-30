@@ -77,9 +77,19 @@
                 ]}
             },
             {
+                'name': 'Existence Check (with else)',
+                'template': '{{?people}}Yes here is the list{{:else}}Nope, no one here{{/people}}',
+                'context': {}
+            },
+            {
                 'name': 'Inverse Existing Check',
                 'template': '{{^people}}No people here.{{/people}}',
                 'context': {}
+            },
+            {
+                'name': 'Inverse Existing Check (with else)',
+                'template': '{{^people}}No people here.{{:else}}Yes, here is the list!{{/people}}',
+                'context': {people: ['people', 'list', 'goes', 'here']}
             }
         ];
 
