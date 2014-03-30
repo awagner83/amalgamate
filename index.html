@@ -38,6 +38,48 @@
         <div class='well' id='htmlOutput'></div>
     </div>
 
+    <div style='display: none;'>
+<div id='replace'>
+Hello {{where}}
+</div>
+<div id='deepReplace'>
+Hello {{thisPlace.where}}!
+</div>
+<div id='objectScoping'>
+Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
+</div>
+<div id='arrayIteration'>
+{{#people}}
+    {{firstName}} {{lastName}}<br>
+{{/people}}
+</div>
+<div id='existenceCheck'>
+{{#people}}
+    {{?child}}Little {{/child}}
+    {{firstName}} {{lastName}}<br>
+{{/people}}
+</div>
+<div id='existenceWithElse'>
+{{?people}}
+    Yes here is the list
+{{:else}}
+    Nope, no one here
+{{/people}}
+</div>
+<div id='inverseExistence'>
+{{^people}}
+    No people here.
+{{/people}}
+</div>
+<div id='inverseExistenceWithElse'>
+{{^people}}
+    No people here.
+{{:else}}
+    Yes, here is the list!
+{{/people}}
+</div>
+    </div>
+
     <script src='dist/amalgamate-min.js'></script>
     <script src='web/jquery.min.js'></script>
     <script src='web/bootstrap.min.js'></script>
@@ -45,31 +87,26 @@
 
         var examples = [
             {
-                'name': 'Replace',
-                'template': 'Hello {{where}}!',
+                'name': 'Replace', 'template': 'replace',
                 'context': {where: 'World'}
             },
             {
-                'name': 'Deep Replace',
-                'template': 'Hello {{thisPlace.where}}!',
+                'name': 'Deep Replace', 'template': 'deepReplace',
                 'context': {thisPlace: {where: 'The Internet'}}
             },
             {
-                'name': 'Object Scoping',
-                'template': 'Hello {{@person}}{{firstName}} {{lastName}}{{/person}}!',
+                'name': 'Object Scoping', 'template': 'objectScoping',
                 'context': {person: {firstName: 'Bob', lastName: 'Smith'}}
             },
             {
-                'name': 'Array Iteration',
-                'template': '{{#people}}{{firstName}} {{lastName}}<br>{{/people}}',
+                'name': 'Array Iteration', 'template': 'arrayIteration',
                 'context': {people: [
                     {firstName: 'Bob', lastName: 'Smith'},
                     {firstName: 'Judy', lastName: 'Smith'}
                 ]}
             },
             {
-                'name': 'Existence Check',
-                'template': '{{#people}}\n  {{?child}}Little {{/child}}\n\  {{firstName}} {{lastName}}<br>\n{{/people}}',
+                'name': 'Existence Check', 'template': 'existenceCheck',
                 'context': {people: [
                     {firstName: 'Bob', lastName: 'Smith'},
                     {firstName: 'Bobby', lastName: 'Smith', child: true},
@@ -77,18 +114,15 @@
                 ]}
             },
             {
-                'name': 'Existence Check (with else)',
-                'template': '{{?people}}Yes here is the list{{:else}}Nope, no one here{{/people}}',
+                'name': 'Existence Check (with else)', 'template': 'existenceWithElse',
                 'context': {}
             },
             {
-                'name': 'Inverse Existing Check',
-                'template': '{{^people}}No people here.{{/people}}',
+                'name': 'Inverse Existing Check', 'template': 'inverseExistence',
                 'context': {}
             },
             {
-                'name': 'Inverse Existing Check (with else)',
-                'template': '{{^people}}No people here.{{:else}}Yes, here is the list!{{/people}}',
+                'name': 'Inverse Existing Check (with else)', 'template': 'inverseExistenceWithElse',
                 'context': {people: ['people', 'list', 'goes', 'here']}
             }
         ];
@@ -106,7 +140,7 @@
 
         var updateContextAndTemplate = function() {
             var selected = examplesIndex[$('#example').val()];
-            $('#template').html(selected.template);
+            $('#template').html($('#' + selected.template).html());
             $('#context').html(JSON.stringify(selected.context, null, 4));
             render();
         };
