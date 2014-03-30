@@ -100,6 +100,7 @@ load = function(frozen) {
                     newData[key] = instruction.data[key];
                 }
                 newData.tpl = load(newData.tpl);
+                if (newData.elseTpl) newData.elseTpl = load(newData.elseTpl);
                 thawed.push({op: opFn, data: newData});
             } else {
                 thawed.push({op: opFn, data: instruction.data});
