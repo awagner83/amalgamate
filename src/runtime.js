@@ -1,13 +1,11 @@
 
-var operations, render_internal, render, escape_html, replace_chars, escape_char;
-
 // Escape html chars
-replace_regex = /[&<>]/g;
-replace_chars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
-escape_char = function (chr) {
+var replace_regex = /[&<>]/g;
+var replace_chars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
+var escape_char = function (chr) {
     return replaceChars[chr];
 };
-escape_html = function (str) {
+var escape_html = function (str) {
     if (replace_regex.test(str)) {
         return ('' + str).replace(replace_regex, escape_char);
     } else {
@@ -23,7 +21,7 @@ var filter = function(val, ctx, filters) {
 };
 
 /** Functionality behind instruction operations **/
-operations = {
+var operations = {
     replace: function (ctx, data) {
         var result  = ctx,
             name    = data.name;
@@ -60,7 +58,7 @@ operations = {
 };
 
 /** Gory rendering details **/
-render_internal = function(compiled, context) {
+var render_internal = function(compiled, context) {
     var len = compiled.length,
         rendered = new Array(len);
     for (var i = 0; i < len; i++) {
@@ -76,7 +74,7 @@ render_internal = function(compiled, context) {
 };
 
 /** Render compiled template with given context **/
-render = function(compiled, context) {
+var render = function(compiled, context) {
     // Shortcut for the simplest case
     if(compiled.length == 1 && typeof compiled[0] === 'string') {
         return compiled[0];
@@ -86,7 +84,7 @@ render = function(compiled, context) {
 };
 
 /** Load compiled template into something runnable **/
-load = function(frozen) {
+var load = function(frozen) {
     var thawed = [];
     for (var i = 0, len = frozen.length; i < len; i++) {
         if (typeof frozen[i] === 'object') {
