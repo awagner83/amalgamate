@@ -42,22 +42,59 @@
 <div id='replace'>
 Hello {{where}}
 </div>
+<div id='replace_context'>
+{
+    where: 'world'
+}
+</div>
 <div id='deepReplace'>
 Hello {{thisPlace.where}}!
 </div>
+<div id='deepReplace_context'>
+{
+    thisPlace: {
+        where: 'The Internet'
+    }
+}
+</div>
 <div id='objectScoping'>
-Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
+Hello {{@person}} {{firstName}} {{lastName}} {{/person}}!
+</div>
+<div id='objectScoping_context'>
+{
+    person: {
+        firstName: 'Bob',
+        lastName: 'Smith'
+    }
+}
 </div>
 <div id='arrayIteration'>
 {{#people}}
     {{firstName}} {{lastName}}<br>
 {{/people}}
 </div>
+<div id='arrayIteration_context'>
+{
+    people: [
+        {firstName: 'Bob', lastName: 'Smith'},
+        {firstName: 'Judy', lastName: 'Smith'}
+    ]
+}
+</div>
 <div id='existenceCheck'>
 {{#people}}
     {{?child}}Little {{/child}}
     {{firstName}} {{lastName}}<br>
 {{/people}}
+</div>
+<div id='existenceCheck_context'>
+{
+    people: [
+        {firstName: 'Bob', lastName: 'Smith'},
+        {firstName: 'Bobby', lastName: 'Smith', child: true},
+        {firstName: 'Judy', lastName: 'Smith'}
+    ]
+}
 </div>
 <div id='existenceWithElse'>
 {{?people}}
@@ -66,10 +103,16 @@ Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
     Nope, no one here
 {{/people}}
 </div>
+<div id='existenceWithElse_context'>
+{}
+</div>
 <div id='inverseExistence'>
 {{^people}}
     No people here.
 {{/people}}
+</div>
+<div id='inverseExistence_context'>
+{}
 </div>
 <div id='inverseExistenceWithElse'>
 {{^people}}
@@ -78,6 +121,22 @@ Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
     Yes, here is the list!
 {{/people}}
 </div>
+<div id='inverseExistenceWithElse_context'>
+{
+    people: ['people', 'list', 'goes', 'here']
+}
+</div>
+<div id='filters'>
+{{name|shout}}
+</div>
+<div id='filters_context'>
+{
+    name: 'bob',
+    shout: function(str) {
+        return str.toUpperCase() + '!';
+    }
+}
+</div>
     </div>
 
     <script src='dist/amalgamate-min.js'></script>
@@ -85,46 +144,22 @@ Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
     <script src='web/bootstrap.min.js'></script>
     <script type='text/javascript'>
 
+        if (!String.prototype.trim) {
+            String.prototype.trim = function () {
+                return this.replace(/^\s+|\s+$/g, '');
+            };
+        }
+
         var examples = [
-            {
-                'name': 'Replace', 'template': 'replace',
-                'context': {where: 'World'}
-            },
-            {
-                'name': 'Deep Replace', 'template': 'deepReplace',
-                'context': {thisPlace: {where: 'The Internet'}}
-            },
-            {
-                'name': 'Object Scoping', 'template': 'objectScoping',
-                'context': {person: {firstName: 'Bob', lastName: 'Smith'}}
-            },
-            {
-                'name': 'Array Iteration', 'template': 'arrayIteration',
-                'context': {people: [
-                    {firstName: 'Bob', lastName: 'Smith'},
-                    {firstName: 'Judy', lastName: 'Smith'}
-                ]}
-            },
-            {
-                'name': 'Existence Check', 'template': 'existenceCheck',
-                'context': {people: [
-                    {firstName: 'Bob', lastName: 'Smith'},
-                    {firstName: 'Bobby', lastName: 'Smith', child: true},
-                    {firstName: 'Judy', lastName: 'Smith'}
-                ]}
-            },
-            {
-                'name': 'Existence Check (with else)', 'template': 'existenceWithElse',
-                'context': {}
-            },
-            {
-                'name': 'Inverse Existing Check', 'template': 'inverseExistence',
-                'context': {}
-            },
-            {
-                'name': 'Inverse Existing Check (with else)', 'template': 'inverseExistenceWithElse',
-                'context': {people: ['people', 'list', 'goes', 'here']}
-            }
+            { 'name': 'Replace', 'id': 'replace' },
+            { 'name': 'Deep Replace', 'id': 'deepReplace' },
+            { 'name': 'Object Scoping', 'id': 'objectScoping' },
+            { 'name': 'Array Iteration', 'id': 'arrayIteration' },
+            { 'name': 'Existence Check', 'id': 'existenceCheck' },
+            { 'name': 'Existence Check (with else)', 'id': 'existenceWithElse' },
+            { 'name': 'Inverse Existing Check', 'id': 'inverseExistence' },
+            { 'name': 'Inverse Existing Check (with else)', 'id': 'inverseExistenceWithElse' },
+            { 'name': 'Filters', 'id': 'filters'}
         ];
 
         var examplesIndex = {};
@@ -140,8 +175,8 @@ Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
 
         var updateContextAndTemplate = function() {
             var selected = examplesIndex[$('#example').val()];
-            $('#template').html($('#' + selected.template).html());
-            $('#context').html(JSON.stringify(selected.context, null, 4));
+            $('#template').html($('#' + selected.id).html().trim());
+            $('#context').html($('#' + selected.id + "_context").html().trim());
             render();
         };
 
@@ -150,9 +185,9 @@ Hello {{@person}} {{firstName}} {{lastName}} {/person}}!
             var htmlout = $("#htmlOutput");
             var time = $("#time");
             try {
-                var context = JSON.parse($("#context").val());
+                eval("var context = " + $("#context").val());
             } catch (ex) {
-                return out.html("Invalid JSON");
+                out.html("Invalid context: " + ex);
             }
             var template = Amalgamate.load(Amalgamate.compile($("#template").val())),
                 start = performance.now(),
