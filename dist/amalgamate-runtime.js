@@ -2,14 +2,14 @@
 require.m = [];
 require.m[0] = { "src/runtime.js": function(module, exports, require){
 // Escape html chars
-var replace_regex = /[&<>]/g;
-var replace_chars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
-var escape_char = function (chr) {
+var replaceRegex = /[&<>]/g;
+var replaceChars = {'<': '&lt;', '>': '&gt;', '&': '&amp;'};
+var escapeChar = function (chr) {
     return replaceChars[chr];
 };
-var escape_html = function (str) {
-    if (replace_regex.test(str)) {
-        return ('' + str).replace(replace_regex, escape_char);
+var escapeHtml = function (str) {
+    if (replaceRegex.test(str)) {
+        return ('' + str).replace(replaceRegex, escapeChar);
     } else {
         return str;
     }
@@ -17,14 +17,12 @@ var escape_html = function (str) {
 
 /** Functionality behind instruction operations **/
 var operations = {
-    replace: function (val) {
-        return escape_html(val);
-    },
+    replace: escapeHtml,
     array: function (val, data) {
         var len = val.length,
             rendered = new Array(len);
         for (var i = 0; i < len; i++)
-            rendered[i] = render_internal(data.tpl, val[i]);
+            rendered[i] = renderInternal(data.tpl, val[i]);
         return [].concat.apply([], rendered).join('');
     },
     object: function (val, data) {
@@ -41,7 +39,7 @@ var operations = {
 };
 
 /** Gory rendering details **/
-var render_internal = function(compiled, context) {
+var renderInternal = function(compiled, context) {
     var len = compiled.length,
         rendered = new Array(len);
     for (var i = 0; i < len; i++) {
@@ -75,7 +73,7 @@ var render = function(compiled, context) {
         return compiled[0];
     }
 
-    return render_internal(compiled, context).join('');
+    return renderInternal(compiled, context).join('');
 };
 
 /** Load compiled template into something runnable **/
