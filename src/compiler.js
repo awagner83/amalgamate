@@ -1,37 +1,34 @@
 
 var runtime = require('./runtime.js');
 
+// Instruction constructor: parse name and filter parts here as they are
+// common to all instructions.
+var Instruction = function(op, name, config) {
+    var parts = name.split('|');
+
+    config.filters = parts.slice(1);
+    config.name = parts[0].split('.');
+
+    this.op = op;
+    this.data = config;
+};
+
 /** Build individual operations to pass to 'render_internal' **/
 var builders = {
     replace: function(name) {
-        var parts = name.split('|'),
-            namePart = parts[0],
-            filters = parts.slice(1),
-            splitName = namePart.split('.');
-
-        return {
-            op: 'replace',
-            data: { name: splitName, filters: filters }
-        };
+        return new Instruction('replace', name, {});
     },
-    array: function(array, tpl) {
-        return { op: 'array', data: { array: array, tpl: tpl } };
+    array: function(name, tpl) {
+        return new Instruction('array', name, {tpl: tpl});
     },
-    object: function(object, tpl) {
-        var parts = object.split('|'),
-            name = parts[0],
-            filters = parts.slice(1);
-
-        return {
-            op: 'object',
-            data: { object: name, tpl: tpl, filters: filters }
-        };
+    object: function(name, tpl) {
+        return new Instruction('object', name, {tpl: tpl});
     },
     ifSo: function(name, tpl, elseTpl) {
-        return { op: 'ifSo', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
+        return new Instruction('ifSo', name, {tpl: tpl, elseTpl: elseTpl});
     },
     ifNot: function(name, tpl, elseTpl) {
-        return { op: 'ifNot', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
+        return new Instruction('ifNot', name, {tpl: tpl, elseTpl: elseTpl});
     }
 };
 
@@ -116,7 +113,6 @@ var compile = function() {
 
                 var elseTemplate;
                 if (hasElse) {
-                    console.log(parts[5]);
                     elseTemplate = filterFalsey(parts[5]);
                 }
                 return builder(parts[1], subTemplate, elseTemplate);
