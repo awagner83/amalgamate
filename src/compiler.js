@@ -7,7 +7,7 @@ var Instruction = function(op, name, config) {
     var parts = name.split('|');
 
     config.filters = parts.slice(1);
-    config.name = parts[0].split('.');
+    config.name = parts[0] === '.' ? [] : parts[0].split('.');
 
     this.op = op;
     this.data = config;

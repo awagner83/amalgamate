@@ -29,6 +29,12 @@ cases = [
         expected: '&lt;b&gt;test'
     }
     {
+        name: 'replace "dot"'
+        template: [replace '.']
+        context: 'foo'
+        expected: 'foo'
+    }
+    {
         name: 'static text and replace'
         template: ['hello ', replace 'you']
         context: {you: 'bob'}
