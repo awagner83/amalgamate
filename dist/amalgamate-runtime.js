@@ -15,46 +15,27 @@ var escape_html = function (str) {
     }
 };
 
-// Filter application
-var filter = function(val, ctx, filters) {
-    for (var i = 0, len = filters.length; i < len; i++)
-        val = ctx[filters[i]](val);
-    return val;
-};
-
 /** Functionality behind instruction operations **/
 var operations = {
-    replace: function (ctx, data) {
-        var result  = ctx,
-            name    = data.name;
-
-        // Traverse to value
-        for (var i = 0, len = name.length; i < len; i++)
-            result = result && result[name[i]];
-
-        // Apply filters
-        if (data.filters.length)
-            result = filter(result, ctx, data.filters);
-
-        return escape_html(result);
+    replace: function (val) {
+        return escape_html(val);
     },
-    array: function (ctx, data) {
-        var arr = ctx[data.array],
-            len = arr.length,
+    array: function (val, data) {
+        var len = val.length,
             rendered = new Array(len);
         for (var i = 0; i < len; i++)
-            rendered[i] = render_internal(data.tpl, arr[i]);
+            rendered[i] = render_internal(data.tpl, val[i]);
         return [].concat.apply([], rendered).join('');
     },
-    object: function (ctx, data) {
-        return render(data.tpl, filter(ctx[data.object], ctx, data.filters));
+    object: function (val, data) {
+        return render(data.tpl, val);
     },
-    ifSo: function (ctx, data) {
-        return (ctx[data.name] && render(data.tpl, ctx)) ||
+    ifSo: function (val, data, ctx) {
+        return (val && render(data.tpl, ctx)) ||
             (data.elseTpl && render(data.elseTpl, ctx)) || '';
     },
-    ifNot: function (ctx, data) {
-        return (!ctx[data.name] && render(data.tpl, ctx)) ||
+    ifNot: function (val, data, ctx) {
+        return (!val && render(data.tpl, ctx)) ||
             (data.elseTpl && render(data.elseTpl, ctx)) || '';
     }
 };
@@ -66,7 +47,19 @@ var render_internal = function(compiled, context) {
     for (var i = 0; i < len; i++) {
         var x = compiled[i];
         if (typeof x === 'object') {
-            rendered[i] = x.op(context, x.data);
+            var localCtx = context,
+                name = x.data.name,
+                filters = x.data.filters;
+
+            // Navigate to requested context
+            for (var j = 0, jlen = name.length; j < jlen; j++)
+                localCtx = localCtx && localCtx[name[j]];
+
+            // Apply filters
+            for (var k = 0, klen = filters.length; k < klen; k++)
+                localCtx = context[filters[k]](localCtx);
+
+            rendered[i] = x.op(localCtx, x.data, context);
         } else {
             rendered[i] = x;
         }

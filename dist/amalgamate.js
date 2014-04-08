@@ -13,37 +13,34 @@ module.exports = {
 "src/compiler.js": function(module, exports, require){
 var runtime = require('./runtime.js');
 
+// Instruction constructor: parse name and filter parts here as they are
+// common to all instructions.
+var Instruction = function(op, name, config) {
+    var parts = name.split('|');
+
+    config.filters = parts.slice(1);
+    config.name = parts[0].split('.');
+
+    this.op = op;
+    this.data = config;
+};
+
 /** Build individual operations to pass to 'render_internal' **/
 var builders = {
     replace: function(name) {
-        var parts = name.split('|'),
-            namePart = parts[0],
-            filters = parts.slice(1),
-            splitName = namePart.split('.');
-
-        return {
-            op: 'replace',
-            data: { name: splitName, filters: filters }
-        };
+        return new Instruction('replace', name, {});
     },
-    array: function(array, tpl) {
-        return { op: 'array', data: { array: array, tpl: tpl } };
+    array: function(name, tpl) {
+        return new Instruction('array', name, {tpl: tpl});
     },
-    object: function(object, tpl) {
-        var parts = object.split('|'),
-            name = parts[0],
-            filters = parts.slice(1);
-
-        return {
-            op: 'object',
-            data: { object: name, tpl: tpl, filters: filters }
-        };
+    object: function(name, tpl) {
+        return new Instruction('object', name, {tpl: tpl});
     },
     ifSo: function(name, tpl, elseTpl) {
-        return { op: 'ifSo', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
+        return new Instruction('ifSo', name, {tpl: tpl, elseTpl: elseTpl});
     },
     ifNot: function(name, tpl, elseTpl) {
-        return { op: 'ifNot', data: { name: name, tpl: tpl, elseTpl: elseTpl } };
+        return new Instruction('ifNot', name, {tpl: tpl, elseTpl: elseTpl});
     }
 };
 
@@ -128,7 +125,6 @@ var compile = function() {
 
                 var elseTemplate;
                 if (hasElse) {
-                    console.log(parts[5]);
                     elseTemplate = filterFalsey(parts[5]);
                 }
                 return builder(parts[1], subTemplate, elseTemplate);
@@ -219,46 +215,27 @@ var escape_html = function (str) {
     }
 };
 
-// Filter application
-var filter = function(val, ctx, filters) {
-    for (var i = 0, len = filters.length; i < len; i++)
-        val = ctx[filters[i]](val);
-    return val;
-};
-
 /** Functionality behind instruction operations **/
 var operations = {
-    replace: function (ctx, data) {
-        var result  = ctx,
-            name    = data.name;
-
-        // Traverse to value
-        for (var i = 0, len = name.length; i < len; i++)
-            result = result && result[name[i]];
-
-        // Apply filters
-        if (data.filters.length)
-            result = filter(result, ctx, data.filters);
-
-        return escape_html(result);
+    replace: function (val) {
+        return escape_html(val);
     },
-    array: function (ctx, data) {
-        var arr = ctx[data.array],
-            len = arr.length,
+    array: function (val, data) {
+        var len = val.length,
             rendered = new Array(len);
         for (var i = 0; i < len; i++)
-            rendered[i] = render_internal(data.tpl, arr[i]);
+            rendered[i] = render_internal(data.tpl, val[i]);
         return [].concat.apply([], rendered).join('');
     },
-    object: function (ctx, data) {
-        return render(data.tpl, filter(ctx[data.object], ctx, data.filters));
+    object: function (val, data) {
+        return render(data.tpl, val);
     },
-    ifSo: function (ctx, data) {
-        return (ctx[data.name] && render(data.tpl, ctx)) ||
+    ifSo: function (val, data, ctx) {
+        return (val && render(data.tpl, ctx)) ||
             (data.elseTpl && render(data.elseTpl, ctx)) || '';
     },
-    ifNot: function (ctx, data) {
-        return (!ctx[data.name] && render(data.tpl, ctx)) ||
+    ifNot: function (val, data, ctx) {
+        return (!val && render(data.tpl, ctx)) ||
             (data.elseTpl && render(data.elseTpl, ctx)) || '';
     }
 };
@@ -270,7 +247,19 @@ var render_internal = function(compiled, context) {
     for (var i = 0; i < len; i++) {
         var x = compiled[i];
         if (typeof x === 'object') {
-            rendered[i] = x.op(context, x.data);
+            var localCtx = context,
+                name = x.data.name,
+                filters = x.data.filters;
+
+            // Navigate to requested context
+            for (var j = 0, jlen = name.length; j < jlen; j++)
+                localCtx = localCtx && localCtx[name[j]];
+
+            // Apply filters
+            for (var k = 0, klen = filters.length; k < klen; k++)
+                localCtx = context[filters[k]](localCtx);
+
+            rendered[i] = x.op(localCtx, x.data, context);
         } else {
             rendered[i] = x;
         }
