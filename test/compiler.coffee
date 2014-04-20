@@ -32,36 +32,36 @@ cases = [
         name: 'array with static text'
         input: '{{#thing}}found a thing{{/thing}}'
         expected: [
-            array 'thing', ['found a thing']
+            array 'thing', '', ['found a thing']
         ]
     }
     {
         name: 'array with static text (and empty end tag)'
         input: '{{#thing}}found a thing{{/}}'
         expected: [
-            array 'thing', ['found a thing']
+            array 'thing', '', ['found a thing']
         ]
     }
     {
         name: 'array with replacement'
         input: '{{#things}}{{thing}}{{/things}}'
         expected: [
-            array 'things', [replace 'thing']
+            array 'things', '', [replace 'thing']
         ]
     }
     {
         name: 'existence check with static text'
         input: '{{?thing}}thing exists!{{/thing}}'
         expected: [
-            ifSo 'thing', ['thing exists!']
+            ifSo 'thing', '', ['thing exists!']
         ]
     }
     {
         name: 'existence check with embedded array'
         input: '{{?things}}{{#things}}this is one thing{{/things}}{{/things}}'
         expected: [
-            ifSo 'things', [
-                array 'things', ['this is one thing']
+            ifSo 'things', '', [
+                array 'things', '', ['this is one thing']
             ]
         ]
     }
@@ -69,35 +69,42 @@ cases = [
         name: 'existence check with else'
         input: '{{?things}}true{{:else}}false{{/things}}'
         expected: [
-            ifSo 'things', ['true'], ['false']
+            ifSo 'things', '', ['true'], ['false']
         ]
     }
     {
         name: 'inverse existence check with static test'
         input: '{{^thing}}thing does not exist!{{/thing}}'
         expected: [
-            ifNot 'thing', ['thing does not exist!']
+            ifNot 'thing', '', ['thing does not exist!']
         ]
     }
     {
         name: 'inverse existence check with else'
         input: '{{^things}}true{{:else}}false{{/things}}'
         expected: [
-            ifNot 'things', ['true'], ['false']
+            ifNot 'things', '', ['true'], ['false']
         ]
     }
     {
         name: 'object with static text'
         input: '{{@thing}}inside my thing{{/thing}}'
         expected: [
-            object 'thing', ['inside my thing']
+            object 'thing', '', ['inside my thing']
+        ]
+    }
+    {
+        name: 'object with post filter'
+        input: '{{@thing}}inside my thing{{/thing|filter}}'
+        expected: [
+            object 'thing', '|filter', ['inside my thing']
         ]
     }
     {
         name: 'object with filter'
         input: '{{@name|split}}{{last}}, {{first}}{{/name}}'
         expected: [
-            object 'name|split', [
+            object 'name|split', '', [
                 replace 'last'
                 ', '
                 replace 'first'
@@ -134,9 +141,9 @@ cases = [
         '''
         expected: [
             'Table of things\n\n'
-            ifSo 'things', [
+            ifSo 'things', '', [
                 '\n<table>\n    <thead>\n        <tr>\n            <th>Column 1</th>\n            <th>Column 2</th>\n        </tr>\n    </thead>\n    <tbody>\n        '
-                array 'things', [
+                array 'things', '', [
                     '\n        <tr>\n            <td>'
                     replace 'col1'
                     '</td>\n            <td>'
@@ -146,7 +153,7 @@ cases = [
                 '\n    </tbody>\n</table>\n'
             ]
             '\n\n'
-            ifNot 'things', ['\nNo things were found!\n']
+            ifNot 'things', '', ['\nNo things were found!\n']
         ]
     }
 ]

@@ -45,17 +45,26 @@ var renderInternal = function(compiled, context) {
         if (typeof x === 'object') {
             var localCtx = context,
                 name = x.data.name,
-                filters = x.data.filters;
+                filters = x.data.filters,
+                postFilters = x.data.postFilters;
 
             // Navigate to requested context
             for (var j = 0, jlen = name.length; j < jlen; j++)
                 localCtx = localCtx && localCtx[name[j]];
 
-            // Apply filters
+            // Apply pre-filters
             for (var k = 0, klen = filters.length; k < klen; k++)
                 localCtx = context[filters[k]](localCtx);
 
-            rendered[i] = x.op(localCtx, x.data, context);
+            // Run operation
+            result = x.op(localCtx, x.data, context);
+
+            // Apply post-filters
+            for (var l = 0, llen = postFilters.length; l < llen; l++)
+                result = context[postFilters[l]](result);
+
+            rendered[i] = result;
+
         } else {
             rendered[i] = x;
         }
