@@ -29,7 +29,7 @@ var benches = {
   },
 
   filter: {
-      source: "FOO {{bar|filter}}",
+      source: "{{@.}}foo {{bar}}{{/|filter}}",
       context: {
           filter: function(text) { return text.toUpperCase(); },
           bar: 'bar'
