@@ -43,7 +43,7 @@ cases = [
     {
         name: 'array with static text'
         template: [
-            array 'things', ['.']
+            array 'things', '', ['.']
         ]
         context: {things: [1,2,3]}
         expected: '...'
@@ -51,7 +51,7 @@ cases = [
     {
         name: 'array with replace'
         template: [
-            array 'things', [replace 'value']
+            array 'things', '', [replace 'value']
         ]
         context: {
             things: [
@@ -62,9 +62,23 @@ cases = [
         expected: '12'
     }
     {
+        name: 'array with replace and post filter'
+        template: [
+            array 'things', '|shout', [replace 'value']
+        ]
+        context: {
+            shout: (str) -> str.toUpperCase() + '!'
+            things: [
+                {value: 'one'}
+                {value: 'two'}
+            ]
+        }
+        expected: 'ONETWO!'
+    }
+    {
         name: 'existence check with static text'
         template: [
-            ifSo 'thing', ['thing exists!']
+            ifSo 'thing', '', ['thing exists!']
         ]
         context: {thing: 'some value'}
         expected: 'thing exists!'
@@ -72,7 +86,7 @@ cases = [
     {
         name: 'existence check with static text (no value found)'
         template: [
-            ifSo 'thing', ['thing exists!']
+            ifSo 'thing', '', ['thing exists!']
         ]
         context: {someOtherThing: 'some value'}
         expected: ''
@@ -80,7 +94,7 @@ cases = [
     {
         name: 'existence check with static text (no value found, but with else)'
         template: [
-            ifSo 'thing', ['thing exists!'], ['thing does not exist']
+            ifSo 'thing', '', ['thing exists!'], ['thing does not exist']
         ]
         context: {someOtherThing: 'some value'}
         expected: 'thing does not exist'
@@ -88,7 +102,7 @@ cases = [
     {
         name: 'inverse existence check with static text'
         template: [
-            ifNot 'thing', ['thing does not exist']
+            ifNot 'thing', '', ['thing does not exist']
         ]
         context: {someOtherThing: 'some value'}
         expected: 'thing does not exist'
@@ -96,7 +110,7 @@ cases = [
     {
         name: 'inverse existence check with static text (value found)'
         template: [
-            ifNot 'thing', ['thing does not exist']
+            ifNot 'thing', '', ['thing does not exist']
         ]
         context: {thing: 'some value'}
         expected: ''
@@ -104,7 +118,7 @@ cases = [
     {
         name: 'inverse existence check with static text (value found, but with else)'
         template: [
-            ifNot 'thing', ['thing does not exist'], ['thing does exist']
+            ifNot 'thing', '', ['thing does not exist'], ['thing does exist']
         ]
         context: {thing: 'some value'}
         expected: 'thing does exist'
@@ -112,7 +126,7 @@ cases = [
     {
         name: 'object scoping'
         template: [
-            object 'thing', [replace 'value']
+            object 'thing', '', [replace 'value']
         ]
         context: {thing: {value: 5}}
         expected: '5'
@@ -138,7 +152,7 @@ cases = [
     {
         name: 'object with filter'
         template: [
-            object 'name|fullName', [
+            object 'name|fullName', '', [
                 replace 'last'
                 ', '
                 replace 'first'
@@ -150,6 +164,22 @@ cases = [
                 [first, last] = name.split ' '
                 first: first, last: last
         expected: 'smith, bob'
+    }
+    {
+        name: 'object with post-filter'
+        template: [
+            object 'name', '|shout', [
+                replace 'last'
+                ', '
+                replace 'first'
+            ]
+        ]
+        context:
+            name:
+                first: 'bob'
+                last: 'smith'
+            shout: (str) -> str.toUpperCase()
+        expected: 'SMITH, BOB'
     }
 ]
 

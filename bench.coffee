@@ -138,6 +138,17 @@ mkTests = ->
             mkMustache "{{#name}}{{last}}, {{first}}{{/name}}"
             mkUnderscore "<% var first = name.first, last = name.last %><%=last %>, <%=first%>"
         ]
+    objectPostFilter:
+        context:
+            shout: (str) ->
+                str.toUpperCase() + '!'
+            name:
+                first: 'Bob'
+                last: 'Smith'
+        expected: "SMITH, BOB!"
+        implementations: [
+            mkAmalgamate "{{@name}}{{last}}, {{first}}{{/name|shout}}"
+        ]
     nestedObject:
         context:
             name:
